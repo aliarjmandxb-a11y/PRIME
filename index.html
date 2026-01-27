@@ -1,218 +1,115 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="fa">
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم مدیریت مالی مشتریان</title>
+    <title>سیستم مدیریت مالی</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Vazirmatn', sans-serif;
-        }
-    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-6">
-    <div id="app" class="max-w-7xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-8 text-white">
-                <div class="flex justify-between items-center flex-wrap gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold mb-2">سیستم مدیریت مالی مشتریان</h1>
-                        <p class="text-indigo-100">مدیریت سفارشات، هزینه‌ها و گزارش‌های مالی - همه چی اتوماتیک</p>
-                    </div>
-                    <button onclick="exportToCSV()" class="bg-white text-indigo-600 px-6 py-3 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-2 font-semibold">
-                        📥 دانلود گزارش Excel
-                    </button>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg">
+        <!-- Header -->
+        <div class="bg-indigo-600 text-white p-6 rounded-t-lg">
+            <h1 class="text-3xl font-bold">سیستم مدیریت مالی مشتریان</h1>
+            <p class="mt-2">مدیریت سفارشات و هزینه‌ها</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4 p-6 bg-gray-50">
+            <div class="bg-green-100 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">کل درآمد</p>
+                <p id="stat-revenue" class="text-2xl font-bold text-green-600">0 AED</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">کل هزینه</p>
+                <p id="stat-expense" class="text-2xl font-bold text-red-600">0 AED</p>
+            </div>
+            <div class="bg-blue-100 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">سود خالص</p>
+                <p id="stat-profit" class="text-2xl font-bold text-blue-600">0 AED</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b">
+            <button class="tab-btn px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600" data-tab="customers">مشتریان</button>
+            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="expenses">هزینه‌ها</button>
+            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="reports">گزارش‌ها</button>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Customers Tab -->
+            <div id="tab-customers" class="tab-content">
+                <div class="mb-4 flex justify-between">
+                    <h2 class="text-xl font-bold">مشتریان</h2>
+                    <button id="btn-show-add-customer" class="bg-indigo-600 text-white px-4 py-2 rounded">+ افزودن مشتری</button>
                 </div>
+
+                <div id="add-customer-form" class="hidden bg-blue-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-3">مشتری جدید</h3>
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <input type="text" id="input-name" placeholder="نام مشتری" class="border p-2 rounded">
+                        <input type="text" id="input-project" placeholder="نام پروژه" class="border p-2 rounded">
+                        <input type="number" id="input-amount" placeholder="مبلغ (AED)" class="border p-2 rounded">
+                    </div>
+                    <button id="btn-save-customer" class="bg-green-600 text-white px-4 py-2 rounded mr-2">ذخیره</button>
+                    <button id="btn-cancel-customer" class="bg-gray-400 text-white px-4 py-2 rounded">انصراف</button>
+                </div>
+
+                <div id="customers-list" class="grid grid-cols-3 gap-4"></div>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-50">
-                <div class="bg-white p-6 rounded-xl shadow-md border-r-4 border-green-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">کل درآمد</p>
-                            <p id="totalRevenue" class="text-2xl font-bold text-green-600 mt-1">0 AED</p>
-                        </div>
-                        <span class="text-5xl opacity-20">💰</span>
-                    </div>
+            <!-- Expenses Tab -->
+            <div id="tab-expenses" class="tab-content hidden">
+                <div class="mb-4 flex justify-between">
+                    <h2 class="text-xl font-bold">هزینه‌ها</h2>
+                    <button id="btn-show-add-expense" class="bg-indigo-600 text-white px-4 py-2 rounded">+ افزودن هزینه</button>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-md border-r-4 border-red-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">کل هزینه‌ها</p>
-                            <p id="totalExpenses" class="text-2xl font-bold text-red-600 mt-1">0 AED</p>
-                        </div>
-                        <span class="text-5xl opacity-20">📊</span>
+                <div id="add-expense-form" class="hidden bg-red-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-3">هزینه جدید</h3>
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <select id="input-customer" class="border p-2 rounded">
+                            <option value="">انتخاب مشتری</option>
+                        </select>
+                        <input type="text" id="input-desc" placeholder="شرح هزینه" class="border p-2 rounded">
+                        <input type="number" id="input-exp-amount" placeholder="مبلغ (AED)" class="border p-2 rounded">
                     </div>
+                    <button id="btn-save-expense" class="bg-green-600 text-white px-4 py-2 rounded mr-2">ذخیره</button>
+                    <button id="btn-cancel-expense" class="bg-gray-400 text-white px-4 py-2 rounded">انصراف</button>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-md border-r-4 border-blue-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm">سود خالص</p>
-                            <p id="totalProfit" class="text-2xl font-bold text-blue-600 mt-1">0 AED</p>
-                        </div>
-                        <span class="text-5xl opacity-20">💵</span>
-                    </div>
-                </div>
+                <table class="w-full border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-right">مشتری</th>
+                            <th class="p-2 text-right">شرح</th>
+                            <th class="p-2 text-right">مبلغ</th>
+                            <th class="p-2 text-right">تاریخ</th>
+                            <th class="p-2 text-right">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenses-list"></tbody>
+                </table>
             </div>
 
-            <!-- Tabs -->
-            <div class="border-b border-gray-200">
-                <div class="flex gap-4 px-6">
-                    <button onclick="showTab('customers')" id="tabCustomers" class="py-4 px-6 font-semibold transition-colors border-b-2 border-indigo-600 text-indigo-600">
-                        مشتریان و سفارشات
-                    </button>
-                    <button onclick="showTab('expenses')" id="tabExpenses" class="py-4 px-6 font-semibold transition-colors text-gray-600 hover:text-indigo-600">
-                        هزینه‌ها
-                    </button>
-                    <button onclick="showTab('reports')" id="tabReports" class="py-4 px-6 font-semibold transition-colors text-gray-600 hover:text-indigo-600">
-                        گزارش‌ها
-                    </button>
-                </div>
-            </div>
-
-            <!-- Content -->
-            <div class="p-6">
-                <!-- Customers Tab -->
-                <div id="customersContent">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">مشتریان</h2>
-                        <button onclick="toggleAddCustomer()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
-                            ➕ افزودن مشتری جدید
-                        </button>
-                    </div>
-
-                    <!-- Add Customer Form -->
-                    <div id="addCustomerForm" class="hidden bg-blue-50 p-6 rounded-lg mb-6 border border-blue-200">
-                        <h3 class="font-bold text-lg mb-4">افزودن مشتری جدید (کد و تاریخ اتوماتیک)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input type="text" id="customerName" placeholder="نام مشتری *" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <input type="text" id="customerProject" placeholder="نام پروژه (اختیاری)" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <input type="number" id="customerAmount" placeholder="مبلغ واریزی (درهم) *" class="border border-gray-300 rounded-lg px-4 py-2">
-                        </div>
-                        <div class="flex gap-3 mt-4">
-                            <button onclick="saveCustomer()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">ذخیره</button>
-                            <button onclick="toggleAddCustomer()" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors">انصراف</button>
-                        </div>
-                    </div>
-
-                    <!-- Customers List -->
-                    <div id="customersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-
-                <!-- Expenses Tab -->
-                <div id="expensesContent" class="hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">هزینه‌ها</h2>
-                        <button onclick="toggleAddExpense()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
-                            ➕ افزودن هزینه
-                        </button>
-                    </div>
-
-                    <!-- Add Expense Form -->
-                    <div id="addExpenseForm" class="hidden bg-red-50 p-6 rounded-lg mb-6 border border-red-200">
-                        <h3 class="font-bold text-lg mb-4">ثبت هزینه جدید (تاریخ اتوماتیک)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <select id="expenseCustomer" class="border border-gray-300 rounded-lg px-4 py-2">
-                                <option value="">انتخاب مشتری *</option>
-                            </select>
-                            <input type="text" id="expenseDescription" placeholder="شرح هزینه *" class="border border-gray-300 rounded-lg px-4 py-2">
-                            <input type="number" id="expenseAmount" placeholder="مبلغ (درهم) *" class="border border-gray-300 rounded-lg px-4 py-2">
-                        </div>
-                        <div class="flex gap-3 mt-4">
-                            <button onclick="saveExpense()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">ذخیره</button>
-                            <button onclick="toggleAddExpense()" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors">انصراف</button>
-                        </div>
-                    </div>
-
-                    <!-- Expenses List -->
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">کد</th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">مشتری</th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">شرح</th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">مبلغ</th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">تاریخ</th>
-                                    <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">عملیات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="expensesList" class="divide-y divide-gray-200"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Reports Tab -->
-                <div id="reportsContent" class="hidden">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">گزارش‌های تفصیلی</h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
-                            <h3 class="font-bold text-lg mb-4 text-green-800">خلاصه مالی</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-700">تعداد مشتریان:</span>
-                                    <span id="reportCustomersCount" class="font-bold text-xl">0</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-700">تعداد هزینه‌ها:</span>
-                                    <span id="reportExpensesCount" class="font-bold text-xl">0</span>
-                                </div>
-                                <div class="flex justify-between items-center pt-3 border-t border-green-300">
-                                    <span class="text-gray-700">میانگین واریز هر مشتری:</span>
-                                    <span id="reportAvgRevenue" class="font-bold text-green-700">0 AED</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
-                            <h3 class="font-bold text-lg mb-4 text-blue-800">نسبت هزینه به درآمد</h3>
-                            <div class="space-y-3">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-700">درصد هزینه‌ها:</span>
-                                    <span id="reportExpensePercent" class="font-bold text-xl text-red-600">0%</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-700">درصد سود:</span>
-                                    <span id="reportProfitPercent" class="font-bold text-xl text-green-600">0%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-4 mt-4">
-                                    <div id="reportProfitBar" class="bg-gradient-to-r from-green-500 to-blue-500 h-4 rounded-full transition-all" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Detailed Report Table -->
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                            <h3 class="font-bold text-lg">گزارش تفصیلی مشتریان</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">کد</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">مشتری</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">پروژه</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">واریز اولیه</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">کل هزینه‌ها</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">مانده</th>
-                                        <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700">سود</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reportsList" class="divide-y divide-gray-200"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <!-- Reports Tab -->
+            <div id="tab-reports" class="tab-content hidden">
+                <h2 class="text-xl font-bold mb-4">گزارش تفصیلی</h2>
+                <table class="w-full border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-right">کد</th>
+                            <th class="p-2 text-right">مشتری</th>
+                            <th class="p-2 text-right">پروژه</th>
+                            <th class="p-2 text-right">واریز</th>
+                            <th class="p-2 text-right">هزینه</th>
+                            <th class="p-2 text-right">مانده</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reports-list"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -221,289 +118,209 @@
         let customers = JSON.parse(localStorage.getItem('customers') || '[]');
         let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US').format(amount) + ' AED';
-        }
-
-        function getCurrentDate() {
-            return new Date().toLocaleDateString('en-GB');
-        }
-
-        function saveData() {
+        function save() {
             localStorage.setItem('customers', JSON.stringify(customers));
             localStorage.setItem('expenses', JSON.stringify(expenses));
         }
 
-        function showTab(tab) {
-            document.querySelectorAll('[id$="Content"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('[id^="tab"]').forEach(el => {
-                el.classList.remove('border-b-2', 'border-indigo-600', 'text-indigo-600');
-                el.classList.add('text-gray-600');
+        function fmt(n) {
+            return new Intl.NumberFormat('en-US').format(n) + ' AED';
+        }
+
+        function getDate() {
+            return new Date().toLocaleDateString('en-GB');
+        }
+
+        function updateStats() {
+            const rev = customers.reduce((s, c) => s + c.amount, 0);
+            const exp = expenses.reduce((s, e) => s + e.amount, 0);
+            document.getElementById('stat-revenue').textContent = fmt(rev);
+            document.getElementById('stat-expense').textContent = fmt(exp);
+            document.getElementById('stat-profit').textContent = fmt(rev - exp);
+        }
+
+        function renderCustomers() {
+            const list = document.getElementById('customers-list');
+            if (customers.length === 0) {
+                list.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-8">هیچ مشتری‌ای ثبت نشده</p>';
+                return;
+            }
+            list.innerHTML = customers.map((c, i) => {
+                const exp = expenses.filter(e => e.cid === c.id).reduce((s, e) => s + e.amount, 0);
+                const bal = c.amount - exp;
+                return `<div class="border p-4 rounded-lg">
+                    <div class="flex justify-between mb-2">
+                        <span class="bg-indigo-100 px-2 py-1 rounded text-sm">کد ${i + 1}</span>
+                        <button onclick="delCustomer(${c.id})" class="text-red-600">🗑️</button>
+                    </div>
+                    <h3 class="font-bold">${c.name}</h3>
+                    <p class="text-sm text-gray-600">${c.project || '-'}</p>
+                    <div class="mt-3 text-sm">
+                        <div class="flex justify-between"><span>واریز:</span><span class="text-green-600">${fmt(c.amount)}</span></div>
+                        <div class="flex justify-between"><span>هزینه:</span><span class="text-red-600">${fmt(exp)}</span></div>
+                        <div class="flex justify-between font-bold"><span>مانده:</span><span class="${bal >= 0 ? 'text-blue-600' : 'text-red-600'}">${fmt(bal)}</span></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">${c.date}</p>
+                </div>`;
+            }).join('');
+        }
+
+        function renderExpenses() {
+            const list = document.getElementById('expenses-list');
+            if (expenses.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">هیچ هزینه‌ای ثبت نشده</td></tr>';
+                return;
+            }
+            list.innerHTML = expenses.map(e => {
+                const c = customers.find(x => x.id === e.cid);
+                return `<tr class="border-t">
+                    <td class="p-2">${c ? c.name : 'نامشخص'}</td>
+                    <td class="p-2">${e.desc}</td>
+                    <td class="p-2 text-red-600">${fmt(e.amount)}</td>
+                    <td class="p-2">${e.date}</td>
+                    <td class="p-2"><button onclick="delExpense(${e.id})" class="text-red-600">🗑️</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderReports() {
+            const list = document.getElementById('reports-list');
+            if (customers.length === 0) {
+                list.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-gray-500">هیچ مشتری‌ای ثبت نشده</td></tr>';
+                return;
+            }
+            list.innerHTML = customers.map((c, i) => {
+                const exp = expenses.filter(e => e.cid === c.id).reduce((s, e) => s + e.amount, 0);
+                const bal = c.amount - exp;
+                return `<tr class="border-t">
+                    <td class="p-2">${i + 1}</td>
+                    <td class="p-2">${c.name}</td>
+                    <td class="p-2">${c.project || '-'}</td>
+                    <td class="p-2 text-green-600">${fmt(c.amount)}</td>
+                    <td class="p-2 text-red-600">${fmt(exp)}</td>
+                    <td class="p-2 ${bal >= 0 ? 'text-blue-600' : 'text-red-600'}">${fmt(bal)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateCustomerSelect() {
+            const sel = document.getElementById('input-customer');
+            sel.innerHTML = '<option value="">انتخاب مشتری</option>' + 
+                customers.map((c, i) => `<option value="${c.id}">کد ${i + 1} - ${c.name}</option>`).join('');
+        }
+
+        window.delCustomer = function(id) {
+            if (!confirm('حذف شود؟')) return;
+            customers = customers.filter(c => c.id !== id);
+            expenses = expenses.filter(e => e.cid !== id);
+            save();
+            renderCustomers();
+            updateStats();
+        };
+
+        window.delExpense = function(id) {
+            if (!confirm('حذف شود؟')) return;
+            expenses = expenses.filter(e => e.id !== id);
+            save();
+            renderExpenses();
+            renderCustomers();
+            updateStats();
+        };
+
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold');
+                    b.classList.add('text-gray-600');
+                });
+                document.getElementById('tab-' + tab).classList.remove('hidden');
+                this.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold');
+                this.classList.remove('text-gray-600');
+                if (tab === 'reports') renderReports();
             });
+        });
 
-            document.getElementById(tab + 'Content').classList.remove('hidden');
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('border-b-2', 'border-indigo-600', 'text-indigo-600');
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('text-gray-600');
+        // Add Customer
+        document.getElementById('btn-show-add-customer').addEventListener('click', function() {
+            document.getElementById('add-customer-form').classList.remove('hidden');
+        });
 
-            if (tab === 'reports') renderReports();
-        }
+        document.getElementById('btn-cancel-customer').addEventListener('click', function() {
+            document.getElementById('add-customer-form').classList.add('hidden');
+        });
 
-        function toggleAddCustomer() {
-            document.getElementById('addCustomerForm').classList.toggle('hidden');
-        }
-
-        function toggleAddExpense() {
-            document.getElementById('addExpenseForm').classList.toggle('hidden');
-            updateExpenseCustomerList();
-        }
-
-        function saveCustomer() {
-            const name = document.getElementById('customerName').value;
-            const project = document.getElementById('customerProject').value;
-            const amount = parseFloat(document.getElementById('customerAmount').value);
-
+        document.getElementById('btn-save-customer').addEventListener('click', function() {
+            const name = document.getElementById('input-name').value.trim();
+            const project = document.getElementById('input-project').value.trim();
+            const amount = parseFloat(document.getElementById('input-amount').value);
+            
             if (!name || !amount) {
-                alert('لطفاً نام مشتری و مبلغ را وارد کنید!');
+                alert('لطفاً نام و مبلغ را وارد کنید');
                 return;
             }
 
             customers.push({
                 id: Date.now(),
-                code: customers.length + 1,
                 name: name,
                 project: project,
-                initialAmount: amount,
-                date: getCurrentDate()
+                amount: amount,
+                date: getDate()
             });
 
-            saveData();
-            document.getElementById('customerName').value = '';
-            document.getElementById('customerProject').value = '';
-            document.getElementById('customerAmount').value = '';
-            toggleAddCustomer();
+            save();
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-project').value = '';
+            document.getElementById('input-amount').value = '';
+            document.getElementById('add-customer-form').classList.add('hidden');
             renderCustomers();
             updateStats();
-        }
+        });
 
-        function saveExpense() {
-            const customerId = parseInt(document.getElementById('expenseCustomer').value);
-            const description = document.getElementById('expenseDescription').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
+        // Add Expense
+        document.getElementById('btn-show-add-expense').addEventListener('click', function() {
+            updateCustomerSelect();
+            document.getElementById('add-expense-form').classList.remove('hidden');
+        });
 
-            if (!customerId || !description || !amount) {
-                alert('لطفاً همه فیلدها را پر کنید!');
+        document.getElementById('btn-cancel-expense').addEventListener('click', function() {
+            document.getElementById('add-expense-form').classList.add('hidden');
+        });
+
+        document.getElementById('btn-save-expense').addEventListener('click', function() {
+            const cid = parseInt(document.getElementById('input-customer').value);
+            const desc = document.getElementById('input-desc').value.trim();
+            const amount = parseFloat(document.getElementById('input-exp-amount').value);
+            
+            if (!cid || !desc || !amount) {
+                alert('لطفاً همه فیلدها را پر کنید');
                 return;
             }
 
             expenses.push({
                 id: Date.now(),
-                customerId: customerId,
-                description: description,
+                cid: cid,
+                desc: desc,
                 amount: amount,
-                date: getCurrentDate()
+                date: getDate()
             });
 
-            saveData();
-            document.getElementById('expenseCustomer').value = '';
-            document.getElementById('expenseDescription').value = '';
-            document.getElementById('expenseAmount').value = '';
-            toggleAddExpense();
+            save();
+            document.getElementById('input-customer').value = '';
+            document.getElementById('input-desc').value = '';
+            document.getElementById('input-exp-amount').value = '';
+            document.getElementById('add-expense-form').classList.add('hidden');
             renderExpenses();
             renderCustomers();
             updateStats();
-        }
+        });
 
-        function deleteCustomer(id) {
-            if (!confirm('آیا مطمئن هستید؟ تمام هزینه‌های این مشتری هم حذف می‌شود.')) return;
-            
-            customers = customers.filter(c => c.id !== id);
-            expenses = expenses.filter(e => e.customerId !== id);
-            saveData();
-            renderCustomers();
-            updateStats();
-        }
-
-        function deleteExpense(id) {
-            if (!confirm('آیا از حذف این هزینه مطمئن هستید؟')) return;
-            
-            expenses = expenses.filter(e => e.id !== id);
-            saveData();
-            renderExpenses();
-            renderCustomers();
-            updateStats();
-        }
-
-        function getCustomerExpenses(customerId) {
-            return expenses.filter(e => e.customerId === customerId);
-        }
-
-        function getCustomerBalance(customerId) {
-            const customer = customers.find(c => c.id === customerId);
-            if (!customer) return 0;
-            
-            const totalExpenses = getCustomerExpenses(customerId).reduce((sum, e) => sum + e.amount, 0);
-            return customer.initialAmount - totalExpenses;
-        }
-
-        function getTotalRevenue() {
-            return customers.reduce((sum, c) => sum + c.initialAmount, 0);
-        }
-
-        function getTotalExpenses() {
-            return expenses.reduce((sum, e) => sum + e.amount, 0);
-        }
-
-        function getTotalProfit() {
-            return getTotalRevenue() - getTotalExpenses();
-        }
-
-        function updateStats() {
-            document.getElementById('totalRevenue').textContent = formatCurrency(getTotalRevenue());
-            document.getElementById('totalExpenses').textContent = formatCurrency(getTotalExpenses());
-            document.getElementById('totalProfit').textContent = formatCurrency(getTotalProfit());
-        }
-
-        function updateExpenseCustomerList() {
-            const select = document.getElementById('expenseCustomer');
-            select.innerHTML = '<option value="">انتخاب مشتری *</option>';
-            customers.forEach(c => {
-                select.innerHTML += `<option value="${c.id}">کد ${c.code} - ${c.name} ${c.project ? '(' + c.project + ')' : ''}</option>`;
-            });
-        }
-
-        function renderCustomers() {
-            const list = document.getElementById('customersList');
-            
-            if (customers.length === 0) {
-                list.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500"><p class="text-5xl mb-4">👥</p><p>هنوز مشتری‌ای ثبت نشده است</p></div>';
-                return;
-            }
-
-            list.innerHTML = customers.map(customer => {
-                const balance = getCustomerBalance(customer.id);
-                const totalExpenses = getCustomerExpenses(customer.id).reduce((sum, e) => sum + e.amount, 0);
-                const balanceColor = balance >= 0 ? 'text-blue-600' : 'text-red-600';
-
-                return `
-                    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">کد ${customer.code}</span>
-                                </div>
-                                <h3 class="font-bold text-lg text-gray-800">${customer.name}</h3>
-                                ${customer.project ? `<p class="text-sm text-gray-600">${customer.project}</p>` : ''}
-                            </div>
-                            <button onclick="deleteCustomer(${customer.id})" class="text-red-600 hover:text-red-700">🗑️</button>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">واریز اولیه:</span>
-                                <span class="font-semibold text-green-600">${formatCurrency(customer.initialAmount)}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">هزینه شده:</span>
-                                <span class="font-semibold text-red-600">${formatCurrency(totalExpenses)}</span>
-                            </div>
-                            <div class="flex justify-between pt-2 border-t border-gray-200">
-                                <span class="text-gray-700 font-semibold">مانده حساب:</span>
-                                <span class="font-bold ${balanceColor}">${formatCurrency(balance)}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
-                            تاریخ ثبت: ${customer.date}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderExpenses() {
-            const list = document.getElementById('expensesList');
-            
-            if (expenses.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center py-12 text-gray-500"><p class="text-5xl mb-4">📄</p><p>هنوز هزینه‌ای ثبت نشده است</p></td></tr>';
-                return;
-            }
-
-            list.innerHTML = expenses.map(expense => {
-                const customer = customers.find(c => c.id === expense.customerId);
-                return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm">
-                            <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">${customer ? customer.code : '?'}</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm">${customer ? customer.name + (customer.project ? ' - ' + customer.project : '') : 'نامشخص'}</td>
-                        <td class="px-6 py-4 text-sm">${expense.description}</td>
-                        <td class="px-6 py-4 text-sm font-semibold text-red-600">${formatCurrency(expense.amount)}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${expense.date}</td>
-                        <td class="px-6 py-4">
-                            <button onclick="deleteExpense(${expense.id})" class="text-red-600 hover:text-red-700">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function renderReports() {
-            const revenue = getTotalRevenue();
-            const totalExp = getTotalExpenses();
-            const profit = getTotalProfit();
-
-            document.getElementById('reportCustomersCount').textContent = customers.length;
-            document.getElementById('reportExpensesCount').textContent = expenses.length;
-            document.getElementById('reportAvgRevenue').textContent = customers.length > 0 ? formatCurrency(revenue / customers.length) : '0 AED';
-            document.getElementById('reportExpensePercent').textContent = revenue > 0 ? ((totalExp / revenue) * 100).toFixed(1) + '%' : '0%';
-            document.getElementById('reportProfitPercent').textContent = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) + '%' : '0%';
-            document.getElementById('reportProfitBar').style.width = (revenue > 0 ? (profit / revenue) * 100 : 0) + '%';
-
-            const list = document.getElementById('reportsList');
-            if (customers.length === 0) {
-                list.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-gray-500">هنوز مشتری‌ای ثبت نشده است</td></tr>';
-                return;
-            }
-
-            list.innerHTML = customers.map(customer => {
-                const totalExpenses = getCustomerExpenses(customer.id).reduce((sum, e) => sum + e.amount, 0);
-                const balance = customer.initialAmount - totalExpenses;
-                const balanceColor = balance >= 0 ? 'text-blue-600' : 'text-red-600';
-                const profitColor = balance >= 0 ? 'text-green-600' : 'text-red-600';
-
-                return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm">
-                            <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold">${customer.code}</span>
-                        </td>
-                        <td class="px-6 py-4 text-sm font-medium">${customer.name}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${customer.project || '-'}</td>
-                        <td class="px-6 py-4 text-sm text-green-600 font-semibold">${formatCurrency(customer.initialAmount)}</td>
-                        <td class="px-6 py-4 text-sm text-red-600 font-semibold">${formatCurrency(totalExpenses)}</td>
-                        <td class="px-6 py-4 text-sm font-semibold ${balanceColor}">${formatCurrency(balance)}</td>
-                        <td class="px-6 py-4 text-sm font-semibold ${profitColor}">${formatCurrency(balance)}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function exportToCSV() {
-            let csv = 'گزارش مالی سیستم\n\n';
-            csv += 'خلاصه مالی:\n';
-            csv += 'کل درآمد,' + getTotalRevenue() + '\n';
-            csv += 'کل هزینه,' + getTotalExpenses() + '\n';
-            csv += 'سود خالص,' + getTotalProfit() + '\n\n';
-            
-            csv += 'گزارش مشتریان:\n';
-            csv += 'کد,نام,پروژه,واریز,هزینه,مانده,سود\n';
-            
-            customers.forEach(customer => {
-                const totalExpenses = getCustomerExpenses(customer.id).reduce((sum, e) => sum + e.amount, 0);
-                const balance = customer.initialAmount - totalExpenses;
-                csv += customer.code + ',' + customer.name + ',' + customer.project + ',' + customer.initialAmount + ',' + totalExpenses + ',' + balance + ',' + balance + '\n';
-            });
-            
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'financial_
+        // Initialize
+        renderCustomers();
+        renderExpenses();
+        updateStats();
+    </script>
+</body>
+</html>
