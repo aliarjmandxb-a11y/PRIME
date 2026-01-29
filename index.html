@@ -5,97 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سیستم مدیریت مالی حرفه‌ای</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Accessible visually-hidden (sr-only) + focusable when focused */
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+      .sr-only:focus, .sr-only:active { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; }
+    </style>
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
+    <!-- Skip link for keyboard / screen reader users -->
+    <a href="#main" class="sr-only" aria-label="پرش به محتوا">پرش به محتوا</a>
+
+    <div id="main" role="main" class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
         <div class="bg-indigo-600 text-white p-6 rounded-t-lg flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold">سیستم مدیریت مالی حرفه‌ای</h1>
                 <p class="mt-2">مدیریت مشتریان، پرداخت‌ها و هزینه‌ها</p>
             </div>
-            <button id="btn-export" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100">
+            <button id="btn-export" type="button" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300" aria-label="دانلود گزارش اکسل">
                 📥 دانلود Excel
             </button>
         </div>
 
-        <div class="grid grid-cols-4 gap-4 p-6 bg-gray-50">
+        <div class="grid grid-cols-4 gap-4 p-6 bg-gray-50" aria-label="خلاصه وضعیت مالی">
             <div class="bg-green-100 p-4 rounded-lg">
                 <p class="text-sm text-gray-600">کل دریافتی از مشتریان</p>
-                <p id="stat-received" class="text-2xl font-bold text-green-600">0 AED</p>
+                <p id="stat-received" class="text-2xl font-bold text-green-600" aria-live="polite" role="status">0 AED</p>
             </div>
             <div class="bg-orange-100 p-4 rounded-lg">
                 <p class="text-sm text-gray-600">باقیمانده دریافتی</p>
-                <p id="stat-remaining" class="text-2xl font-bold text-orange-600">0 AED</p>
+                <p id="stat-remaining" class="text-2xl font-bold text-orange-600" aria-live="polite" role="status">0 AED</p>
             </div>
             <div class="bg-red-100 p-4 rounded-lg">
                 <p class="text-sm text-gray-600">هزینه‌های پرداختی</p>
-                <p id="stat-paid" class="text-2xl font-bold text-red-600">0 AED</p>
+                <p id="stat-paid" class="text-2xl font-bold text-red-600" aria-live="polite" role="status">0 AED</p>
             </div>
             <div class="bg-blue-100 p-4 rounded-lg">
                 <p class="text-sm text-gray-600">سود خالص</p>
-                <p id="stat-profit" class="text-2xl font-bold text-blue-600">0 AED</p>
+                <p id="stat-profit" class="text-2xl font-bold text-blue-600" aria-live="polite" role="status">0 AED</p>
             </div>
         </div>
 
-        <div class="flex border-b">
-            <button class="tab-btn px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600" data-tab="customers">مشتریان و پروژه‌ها</button>
-            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="payments">دریافت‌ها</button>
-            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="expenses">پرداخت‌ها (هزینه‌ها)</button>
-            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="reports">گزارش‌ها</button>
+        <div class="flex border-b" role="tablist" aria-label="منو تب‌ها">
+            <button id="tab-btn-customers" class="tab-btn px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600" data-tab="customers" role="tab" aria-selected="true" aria-controls="tab-customers">مشتریان و پروژه‌ها</button>
+            <button id="tab-btn-payments" class="tab-btn px-6 py-3 text-gray-600" data-tab="payments" role="tab" aria-selected="false" aria-controls="tab-payments">دریافت‌ها</button>
+            <button id="tab-btn-expenses" class="tab-btn px-6 py-3 text-gray-600" data-tab="expenses" role="tab" aria-selected="false" aria-controls="tab-expenses">پرداخت‌ها (هزینه‌ها)</button>
+            <button id="tab-btn-reports" class="tab-btn px-6 py-3 text-gray-600" data-tab="reports" role="tab" aria-selected="false" aria-controls="tab-reports">گزارش‌ها</button>
         </div>
 
         <div class="p-6">
             <!-- Customers Tab -->
-            <div id="tab-customers" class="tab-content">
+            <div id="tab-customers" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-customers">
                 <div class="mb-4 flex justify-between">
                     <h2 class="text-xl font-bold">پروژه‌های مشتریان</h2>
-                    <button id="btn-add-customer" class="bg-indigo-600 text-white px-4 py-2 rounded">+ پروژه جدید</button>
+                    <button id="btn-add-customer" class="bg-indigo-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-300" type="button">+ پروژه جدید</button>
                 </div>
 
-                <div id="form-customer" class="hidden bg-blue-50 p-4 rounded-lg mb-4">
+                <div id="form-customer" class="hidden bg-blue-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت پروژه جدید</h3>
                     <div class="grid grid-cols-4 gap-3 mb-3">
-                        <input type="text" id="inp-cust-name" placeholder="نام مشتری *" class="border p-2 rounded">
-                        <input type="text" id="inp-cust-project" placeholder="نام پروژه *" class="border p-2 rounded">
-                        <input type="number" id="inp-cust-total" placeholder="مبلغ کل قرارداد (AED) *" class="border p-2 rounded">
-                        <input type="text" id="inp-cust-desc" placeholder="توضیحات" class="border p-2 rounded">
+                        <label for="inp-cust-name" class="sr-only">نام مشتری</label>
+                        <input type="text" id="inp-cust-name" placeholder="نام مشتری *" class="border p-2 rounded" required>
+                        
+                        <label for="inp-cust-project" class="sr-only">نام پروژه</label>
+                        <input type="text" id="inp-cust-project" placeholder="نام پروژه *" class="border p-2 rounded" required>
+                        
+                        <label for="inp-cust-total" class="sr-only">مبلغ کل قرارداد</label>
+                        <input type="number" id="inp-cust-total" placeholder="مبلغ کل قرارداد (AED) *" class="border p-2 rounded" min="0" step="0.01" required>
+                        
+                        <label for="inp-cust-desc" class="sr-only">توضیحات</label>
+                        <input type="text" id="inp-cust-desc" placeholder="توضیحات" class="border p-2 rounded" aria-describedby="cust-desc-help">
                     </div>
+                    <p id="cust-desc-help" class="sr-only">توضیحات اختیاری درباره پروژه</p>
                     <input type="hidden" id="edit-customer-id">
-                    <button id="btn-save-customer" class="bg-green-600 text-white px-4 py-2 rounded">ذخیره</button>
-                    <button id="btn-cancel-customer" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
+                    <button id="btn-save-customer" class="bg-green-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300" type="button">ذخیره</button>
+                    <button id="btn-cancel-customer" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 focus:outline-none focus:ring-2 focus:ring-gray-300" type="button">انصراف</button>
                 </div>
 
-                <div id="customers-list" class="grid grid-cols-1 gap-4"></div>
+                <div id="customers-list" class="grid grid-cols-1 gap-4" aria-live="polite"></div>
             </div>
 
             <!-- Payments Tab -->
-            <div id="tab-payments" class="tab-content hidden">
+            <div id="tab-payments" class="tab-content hidden" aria-hidden="true" role="tabpanel" aria-labelledby="tab-btn-payments">
                 <div class="mb-4 flex justify-between">
                     <h2 class="text-xl font-bold">دریافت‌های مشتریان (پرداخت‌های قسطی)</h2>
-                    <button id="btn-add-payment" class="bg-green-600 text-white px-4 py-2 rounded">+ دریافت جدید</button>
+                    <button id="btn-add-payment" class="bg-green-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300" type="button">+ دریافت جدید</button>
                 </div>
 
-                <div id="form-payment" class="hidden bg-green-50 p-4 rounded-lg mb-4">
+                <div id="form-payment" class="hidden bg-green-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت دریافتی جدید</h3>
                     <div class="grid grid-cols-3 gap-3 mb-3">
-                        <select id="inp-pay-customer" class="border p-2 rounded">
+                        <label for="inp-pay-customer" class="sr-only">انتخاب مشتری</label>
+                        <select id="inp-pay-customer" class="border p-2 rounded" required>
                             <option value="">انتخاب مشتری/پروژه *</option>
                         </select>
-                        <input type="number" id="inp-pay-amount" placeholder="مبلغ دریافتی (AED) *" class="border p-2 rounded">
+                        
+                        <label for="inp-pay-amount" class="sr-only">مبلغ دریافتی</label>
+                        <input type="number" id="inp-pay-amount" placeholder="مبلغ دریافتی (AED) *" class="border p-2 rounded" min="0" step="0.01" required>
+                        
+                        <label for="inp-pay-note" class="sr-only">یادداشت</label>
                         <input type="text" id="inp-pay-note" placeholder="یادداشت" class="border p-2 rounded">
                     </div>
-                    <button id="btn-save-payment" class="bg-green-600 text-white px-4 py-2 rounded">ثبت دریافت</button>
-                    <button id="btn-cancel-payment" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
+                    <button id="btn-save-payment" class="bg-green-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300" type="button">ثبت دریافت</button>
+                    <button id="btn-cancel-payment" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 focus:outline-none focus:ring-2 focus:ring-gray-300" type="button">انصراف</button>
                 </div>
 
-                <table class="w-full border">
+                <table class="w-full border" aria-describedby="payments-caption">
+                    <caption id="payments-caption" class="sr-only">لیست دریافت‌های مشتریان</caption>
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2 text-right">تاریخ</th>
-                            <th class="p-2 text-right">مشتری/پروژه</th>
-                            <th class="p-2 text-right">مبلغ دریافتی</th>
-                            <th class="p-2 text-right">یادداشت</th>
-                            <th class="p-2 text-right">حذف</th>
+                            <th scope="col" class="p-2 text-right">تاریخ</th>
+                            <th scope="col" class="p-2 text-right">مشتری/پروژه</th>
+                            <th scope="col" class="p-2 text-right">مبلغ دریافتی</th>
+                            <th scope="col" class="p-2 text-right">یادداشت</th>
+                            <th scope="col" class="p-2 text-right">حذف</th>
                         </tr>
                     </thead>
                     <tbody id="payments-list"></tbody>
@@ -103,35 +125,43 @@
             </div>
 
             <!-- Expenses Tab -->
-            <div id="tab-expenses" class="tab-content hidden">
+            <div id="tab-expenses" class="tab-content hidden" aria-hidden="true" role="tabpanel" aria-labelledby="tab-btn-expenses">
                 <div class="mb-4 flex justify-between">
                     <h2 class="text-xl font-bold">هزینه‌های پرداختی (به پیمانکار/کارگر)</h2>
-                    <button id="btn-add-expense" class="bg-red-600 text-white px-4 py-2 rounded">+ هزینه جدید</button>
+                    <button id="btn-add-expense" class="bg-red-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-red-300" type="button">+ هزینه جدید</button>
                 </div>
 
-                <div id="form-expense" class="hidden bg-red-50 p-4 rounded-lg mb-4">
+                <div id="form-expense" class="hidden bg-red-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت هزینه جدید</h3>
                     <div class="grid grid-cols-4 gap-3 mb-3">
-                        <select id="inp-exp-customer" class="border p-2 rounded">
+                        <label for="inp-exp-customer" class="sr-only">انتخاب پروژه</label>
+                        <select id="inp-exp-customer" class="border p-2 rounded" required>
                             <option value="">انتخاب پروژه *</option>
                         </select>
-                        <input type="text" id="inp-exp-desc" placeholder="شرح هزینه *" class="border p-2 rounded">
-                        <input type="number" id="inp-exp-amount" placeholder="مبلغ پرداختی (AED) *" class="border p-2 rounded">
+
+                        <label for="inp-exp-desc" class="sr-only">شرح هزینه</label>
+                        <input type="text" id="inp-exp-desc" placeholder="شرح هزینه *" class="border p-2 rounded" required>
+
+                        <label for="inp-exp-amount" class="sr-only">مبلغ پرداختی</label>
+                        <input type="number" id="inp-exp-amount" placeholder="مبلغ پرداختی (AED) *" class="border p-2 rounded" min="0" step="0.01" required>
+
+                        <label for="inp-exp-to" class="sr-only">پرداخت به</label>
                         <input type="text" id="inp-exp-to" placeholder="پرداخت به چه کسی" class="border p-2 rounded">
                     </div>
-                    <button id="btn-save-expense" class="bg-green-600 text-white px-4 py-2 rounded">ثبت هزینه</button>
-                    <button id="btn-cancel-expense" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
+                    <button id="btn-save-expense" class="bg-green-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300" type="button">ثبت هزینه</button>
+                    <button id="btn-cancel-expense" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 focus:outline-none focus:ring-2 focus:ring-gray-300" type="button">انصراف</button>
                 </div>
 
-                <table class="w-full border">
+                <table class="w-full border" aria-describedby="expenses-caption">
+                    <caption id="expenses-caption" class="sr-only">لیست هزینه‌های پرداختی</caption>
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2 text-right">تاریخ</th>
-                            <th class="p-2 text-right">پروژه</th>
-                            <th class="p-2 text-right">شرح</th>
-                            <th class="p-2 text-right">پرداخت به</th>
-                            <th class="p-2 text-right">مبلغ</th>
-                            <th class="p-2 text-right">حذف</th>
+                            <th scope="col" class="p-2 text-right">تاریخ</th>
+                            <th scope="col" class="p-2 text-right">پروژه</th>
+                            <th scope="col" class="p-2 text-right">شرح</th>
+                            <th scope="col" class="p-2 text-right">پرداخت به</th>
+                            <th scope="col" class="p-2 text-right">مبلغ</th>
+                            <th scope="col" class="p-2 text-right">حذف</th>
                         </tr>
                     </thead>
                     <tbody id="expenses-list"></tbody>
@@ -139,21 +169,22 @@
             </div>
 
             <!-- Reports Tab -->
-            <div id="tab-reports" class="tab-content hidden">
+            <div id="tab-reports" class="tab-content hidden" aria-hidden="true" role="tabpanel" aria-labelledby="tab-btn-reports">
                 <h2 class="text-xl font-bold mb-4">گزارش کامل پروژه‌ها</h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full border text-sm">
+                    <table class="w-full border text-sm" aria-describedby="reports-caption">
+                        <caption id="reports-caption" class="sr-only">گزارش تفصیلی پروژه‌ها</caption>
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="p-2 text-right">کد</th>
-                                <th class="p-2 text-right">مشتری</th>
-                                <th class="p-2 text-right">پروژه</th>
-                                <th class="p-2 text-right">قرارداد کل</th>
-                                <th class="p-2 text-right">دریافت شده</th>
-                                <th class="p-2 text-right">باقیمانده</th>
-                                <th class="p-2 text-right">هزینه‌ها</th>
-                                <th class="p-2 text-right">سود</th>
-                                <th class="p-2 text-right">وضعیت</th>
+                                <th scope="col" class="p-2 text-right">کد</th>
+                                <th scope="col" class="p-2 text-right">مشتری</th>
+                                <th scope="col" class="p-2 text-right">پروژه</th>
+                                <th scope="col" class="p-2 text-right">قرارداد کل</th>
+                                <th scope="col" class="p-2 text-right">دریافت شده</th>
+                                <th scope="col" class="p-2 text-right">باقیمانده</th>
+                                <th scope="col" class="p-2 text-right">هزینه‌ها</th>
+                                <th scope="col" class="p-2 text-right">سود</th>
+                                <th scope="col" class="p-2 text-right">وضعیت</th>
                             </tr>
                         </thead>
                         <tbody id="reports-list"></tbody>
@@ -174,26 +205,28 @@
             localStorage.setItem('expenses2', JSON.stringify(expenses));
         }
 
+        // Use Arabic (UAE) locale for formatting so screen readers and locale-sensitive formatting match the page language
         function fmt(n) {
-            return new Intl.NumberFormat('en-US').format(n) + ' AED';
+            const num = Number(n) || 0;
+            return new Intl.NumberFormat('ar-AE', { maximumFractionDigits: 2 }).format(num) + ' AED';
         }
 
         function getDate() {
-            return new Date().toLocaleDateString('en-GB');
+            return new Date().toLocaleDateString('ar-AE');
         }
 
         function getPayments(cid) {
-            return payments.filter(p => p.cid === cid).reduce((s, p) => s + p.amount, 0);
+            return payments.filter(p => p.cid === cid).reduce((s, p) => s + Number(p.amount || 0), 0);
         }
 
         function getExpenses(cid) {
-            return expenses.filter(e => e.cid === cid).reduce((s, e) => s + e.amount, 0);
+            return expenses.filter(e => e.cid === cid).reduce((s, e) => s + Number(e.amount || 0), 0);
         }
 
         function updateStats() {
-            const totalContract = customers.reduce((s, c) => s + c.total, 0);
-            const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
-            const totalPaid = expenses.reduce((s, e) => s + e.amount, 0);
+            const totalContract = customers.reduce((s, c) => s + Number(c.total || 0), 0);
+            const totalReceived = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
+            const totalPaid = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
             const remaining = totalContract - totalReceived;
             const profit = totalReceived - totalPaid;
 
@@ -201,6 +234,10 @@
             document.getElementById('stat-remaining').textContent = fmt(remaining);
             document.getElementById('stat-paid').textContent = fmt(totalPaid);
             document.getElementById('stat-profit').textContent = fmt(profit);
+
+            // small aria-live notification for screen readers
+            const live = document.getElementById('sr-live-notice');
+            if (live) live.textContent = `آمار به‌روز شد: دریافتی ${fmt(totalReceived)}, باقیمانده ${fmt(remaining)}, پرداختی ${fmt(totalPaid)}, سود ${fmt(profit)}`;
         }
 
         function renderCustomers() {
@@ -212,7 +249,7 @@
             list.innerHTML = customers.map((c, i) => {
                 const received = getPayments(c.id);
                 const paid = getExpenses(c.id);
-                const remaining = c.total - received;
+                const remaining = Number(c.total || 0) - received;
                 const profit = received - paid;
                 
                 let statusColor = 'bg-gray-200';
@@ -225,15 +262,15 @@
                     statusText = 'قسطی';
                 }
 
-                return `<div class="border rounded-lg p-4 hover:shadow-md transition">
+                return `<div class="border rounded-lg p-4 hover:shadow-md transition" role="group" aria-label="پروژه ${i + 1}">
                     <div class="flex justify-between items-start mb-3">
                         <div>
                             <span class="bg-indigo-100 px-2 py-1 rounded text-sm font-bold">کد ${i + 1}</span>
                             <span class="${statusColor} px-2 py-1 rounded text-sm mr-2">${statusText}</span>
                         </div>
                         <div>
-                            <button onclick="editCustomer(${c.id})" class="text-blue-600 ml-2">✏️</button>
-                            <button onclick="delCustomer(${c.id})" class="text-red-600">🗑️</button>
+                            <button type="button" onclick="editCustomer(${c.id})" aria-label="ویرایش پروژه" class="text-blue-600 ml-2 focus:outline-none focus:ring-2 focus:ring-indigo-300">✏️</button>
+                            <button type="button" onclick="delCustomer(${c.id})" aria-label="حذف پروژه" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button>
                         </div>
                     </div>
                     <h3 class="font-bold text-lg">${c.name}</h3>
@@ -280,7 +317,7 @@
                     <td class="p-2">${c ? c.name + ' - ' + c.project : 'نامشخص'}</td>
                     <td class="p-2 font-bold text-green-600">${fmt(p.amount)}</td>
                     <td class="p-2 text-gray-600">${p.note || '-'}</td>
-                    <td class="p-2"><button onclick="delPayment(${p.id})" class="text-red-600">🗑️</button></td>
+                    <td class="p-2"><button type="button" onclick="delPayment(${p.id})" aria-label="حذف دریافتی" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>
                 </tr>`;
             }).join('');
         }
@@ -299,7 +336,7 @@
                     <td class="p-2">${e.desc}</td>
                     <td class="p-2 text-gray-600">${e.to || '-'}</td>
                     <td class="p-2 font-bold text-red-600">${fmt(e.amount)}</td>
-                    <td class="p-2"><button onclick="delExpense(${e.id})" class="text-red-600">🗑️</button></td>
+                    <td class="p-2"><button type="button" onclick="delExpense(${e.id})" aria-label="حذف هزینه" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>
                 </tr>`;
             }).join('');
         }
@@ -313,7 +350,7 @@
             list.innerHTML = customers.map((c, i) => {
                 const received = getPayments(c.id);
                 const paid = getExpenses(c.id);
-                const remaining = c.total - received;
+                const remaining = Number(c.total || 0) - received;
                 const profit = received - paid;
                 
                 let status = 'در انتظار دریافت';
@@ -356,10 +393,13 @@
             document.getElementById('inp-cust-desc').value = c.desc || '';
             document.getElementById('edit-customer-id').value = id;
             document.getElementById('form-customer').classList.remove('hidden');
-            window.scrollTo(0, 200);
+            document.getElementById('form-customer').setAttribute('aria-hidden','false');
+            // ensure focus lands on first input for keyboard users
+            document.getElementById('inp-cust-name').focus();
         };
 
         window.delCustomer = function(id) {
+            // use a custom confirm flow fallback for screen readers; keep native confirm for simplicity
             if (!confirm('حذف شود؟ تمام دریافت‌ها و هزینه‌های این پروژه هم حذف می‌شود.')) return;
             customers = customers.filter(c => c.id !== id);
             payments = payments.filter(p => p.cid !== id);
@@ -367,6 +407,8 @@
             save();
             renderCustomers();
             updateStats();
+            updateSelects();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک پروژه حذف شد';
         };
 
         window.delPayment = function(id) {
@@ -376,6 +418,7 @@
             renderPayments();
             renderCustomers();
             updateStats();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک دریافتی حذف شد';
         };
 
         window.delExpense = function(id) {
@@ -385,32 +428,53 @@
             renderExpenses();
             renderCustomers();
             updateStats();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک هزینه حذف شد';
         };
 
-        // Tabs
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tab = this.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold');
-                    b.classList.add('text-gray-600');
+        // Tabs keyboard support and ARIA management
+        (function initTabs(){
+            const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+            tabs.forEach((btn, idx) => {
+                btn.setAttribute('role','tab');
+                btn.setAttribute('tabindex', btn.getAttribute('aria-selected') === 'true' ? '0' : '-1');
+                btn.addEventListener('keydown', (e) => {
+                    let newIndex;
+                    if (e.key === 'ArrowRight') newIndex = (idx + 1) % tabs.length;
+                    if (e.key === 'ArrowLeft') newIndex = (idx - 1 + tabs.length) % tabs.length;
+                    if (e.key === 'Home') newIndex = 0;
+                    if (e.key === 'End') newIndex = tabs.length - 1;
+                    if (newIndex !== undefined) {
+                        tabs[newIndex].focus();
+                        tabs[newIndex].click();
+                        e.preventDefault();
+                    }
                 });
-                document.getElementById('tab-' + tab).classList.remove('hidden');
-                this.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold');
-                this.classList.remove('text-gray-600');
-                if (tab === 'reports') renderReports();
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(t => { t.classList.add('hidden'); t.setAttribute('aria-hidden', 'true'); });
+                    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('text-indigo-600','border-b-2','border-indigo-600','font-bold'); b.classList.add('text-gray-600'); b.setAttribute('aria-selected','false'); b.setAttribute('tabindex','-1'); });
+                    document.getElementById('tab-' + tab).classList.remove('hidden');
+                    document.getElementById('tab-' + tab).setAttribute('aria-hidden','false');
+                    btn.classList.add('text-indigo-600','border-b-2','border-indigo-600','font-bold');
+                    btn.classList.remove('text-gray-600');
+                    btn.setAttribute('aria-selected','true');
+                    btn.setAttribute('tabindex','0');
+                    if (tab === 'reports') renderReports();
+                });
             });
-        });
+        })();
 
         // Customer Form
         document.getElementById('btn-add-customer').addEventListener('click', () => {
             document.getElementById('edit-customer-id').value = '';
             document.getElementById('form-customer').classList.remove('hidden');
+            document.getElementById('form-customer').setAttribute('aria-hidden', 'false');
+            document.getElementById('inp-cust-name').focus();
         });
 
         document.getElementById('btn-cancel-customer').addEventListener('click', () => {
             document.getElementById('form-customer').classList.add('hidden');
+            document.getElementById('form-customer').setAttribute('aria-hidden', 'true');
             document.getElementById('inp-cust-name').value = '';
             document.getElementById('inp-cust-project').value = '';
             document.getElementById('inp-cust-total').value = '';
@@ -425,7 +489,8 @@
             const desc = document.getElementById('inp-cust-desc').value.trim();
             const editId = document.getElementById('edit-customer-id').value;
 
-            if (!name || !project || !total) {
+            if (!name || !project || isNaN(total)) {
+                // show accessible error
                 alert('لطفاً نام، پروژه و مبلغ کل را وارد کنید');
                 return;
             }
@@ -449,16 +514,20 @@
             renderCustomers();
             updateStats();
             updateSelects();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک پروژه ذخیره شد';
         });
 
         // Payment Form
         document.getElementById('btn-add-payment').addEventListener('click', () => {
             updateSelects();
             document.getElementById('form-payment').classList.remove('hidden');
+            document.getElementById('form-payment').setAttribute('aria-hidden', 'false');
+            document.getElementById('inp-pay-customer').focus();
         });
 
         document.getElementById('btn-cancel-payment').addEventListener('click', () => {
             document.getElementById('form-payment').classList.add('hidden');
+            document.getElementById('form-payment').setAttribute('aria-hidden', 'true');
         });
 
         document.getElementById('btn-save-payment').addEventListener('click', () => {
@@ -466,7 +535,7 @@
             const amount = parseFloat(document.getElementById('inp-pay-amount').value);
             const note = document.getElementById('inp-pay-note').value.trim();
 
-            if (!cid || !amount) {
+            if (isNaN(cid) || isNaN(amount)) {
                 alert('لطفاً مشتری و مبلغ را وارد کنید');
                 return;
             }
@@ -482,19 +551,24 @@
             document.getElementById('inp-pay-amount').value = '';
             document.getElementById('inp-pay-note').value = '';
             document.getElementById('form-payment').classList.add('hidden');
+            document.getElementById('form-payment').setAttribute('aria-hidden', 'true');
             renderPayments();
             renderCustomers();
             updateStats();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک دریافتی ثبت شد';
         });
 
         // Expense Form
         document.getElementById('btn-add-expense').addEventListener('click', () => {
             updateSelects();
             document.getElementById('form-expense').classList.remove('hidden');
+            document.getElementById('form-expense').setAttribute('aria-hidden', 'false');
+            document.getElementById('inp-exp-customer').focus();
         });
 
         document.getElementById('btn-cancel-expense').addEventListener('click', () => {
             document.getElementById('form-expense').classList.add('hidden');
+            document.getElementById('form-expense').setAttribute('aria-hidden', 'true');
         });
 
         document.getElementById('btn-save-expense').addEventListener('click', () => {
@@ -503,7 +577,7 @@
             const amount = parseFloat(document.getElementById('inp-exp-amount').value);
             const to = document.getElementById('inp-exp-to').value.trim();
 
-            if (!cid || !desc || !amount) {
+            if (isNaN(cid) || !desc || isNaN(amount)) {
                 alert('لطفاً پروژه، شرح و مبلغ را وارد کنید');
                 return;
             }
@@ -520,20 +594,22 @@
             document.getElementById('inp-exp-amount').value = '';
             document.getElementById('inp-exp-to').value = '';
             document.getElementById('form-expense').classList.add('hidden');
+            document.getElementById('form-expense').setAttribute('aria-hidden', 'true');
             renderExpenses();
             renderCustomers();
             updateStats();
+            const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک هزینه ثبت شد';
         });
 
-        // Export Excel
+        // Export CSV
         document.getElementById('btn-export').addEventListener('click', () => {
-            let csv = '\ufeffگزارش کامل مالی\n\n';
+            let csv = '\uFEFFگزارش کامل مالی\n\n';
             csv += 'تاریخ گزارش:,' + getDate() + '\n\n';
             
             csv += 'خلاصه مالی:\n';
-            const totalContract = customers.reduce((s, c) => s + c.total, 0);
-            const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
-            const totalPaid = expenses.reduce((s, e) => s + e.amount, 0);
+            const totalContract = customers.reduce((s, c) => s + Number(c.total || 0), 0);
+            const totalReceived = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
+            const totalPaid = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
             const remaining = totalContract - totalReceived;
             const profit = totalReceived - totalPaid;
             
@@ -549,7 +625,7 @@
             customers.forEach((c, i) => {
                 const received = getPayments(c.id);
                 const paid = getExpenses(c.id);
-                const rem = c.total - received;
+                const rem = Number(c.total || 0) - received;
                 const prof = received - paid;
                 let status = rem === 0 ? 'تسویه شده' : (received > 0 ? 'قسطی' : 'در انتظار');
                 csv += `${i + 1},${c.name},${c.project},${c.total},${received},${rem},${paid},${prof},${status}\n`;
@@ -576,9 +652,21 @@
             link.click();
         });
 
+        // small hidden aria-live region for CRUD notifications
+        (function insertAriaLive(){
+            const div = document.createElement('div');
+            div.id = 'sr-live-notice';
+            div.className = 'sr-only';
+            div.setAttribute('aria-live','polite');
+            document.body.appendChild(div);
+        })();
+
         // Initialize
         renderCustomers();
         renderPayments();
         renderExpenses();
         updateStats();
         updateSelects();
+    </script>
+</body>
+</html>
