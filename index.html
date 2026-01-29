@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="rtl" lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -134,7 +134,7 @@
                 <div id="form-expense" class="hidden bg-red-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت هزینه جدید</h3>
                     <div class="grid grid-cols-4 gap-3 mb-3">
-                        <label for="inp-exp-customer" class="sr-only">انتخاب پروژه</label>
+                        <label for="inp-exp-customer" class="sr-only">انتخاب پرو��ه</label>
                         <select id="inp-exp-customer" class="border p-2 rounded" required>
                             <option value="">انتخاب پروژه *</option>
                         </select>
@@ -205,14 +205,14 @@
             localStorage.setItem('expenses2', JSON.stringify(expenses));
         }
 
-        // Use Arabic (UAE) locale for formatting so screen readers and locale-sensitive formatting match the page language
+        // Use Persian (Iran) locale for formatting so screen readers and locale-sensitive formatting match the page language
         function fmt(n) {
             const num = Number(n) || 0;
-            return new Intl.NumberFormat('ar-AE', { maximumFractionDigits: 2 }).format(num) + ' AED';
+            return new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 }).format(num) + ' AED';
         }
 
         function getDate() {
-            return new Date().toLocaleDateString('ar-AE');
+            return new Date().toLocaleDateString('fa-IR');
         }
 
         function getPayments(cid) {
@@ -605,23 +605,23 @@
         document.getElementById('btn-export').addEventListener('click', () => {
             let csv = '\uFEFFگزارش کامل مالی\n\n';
             csv += 'تاریخ گزارش:,' + getDate() + '\n\n';
-            
+
             csv += 'خلاصه مالی:\n';
             const totalContract = customers.reduce((s, c) => s + Number(c.total || 0), 0);
             const totalReceived = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
             const totalPaid = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
             const remaining = totalContract - totalReceived;
             const profit = totalReceived - totalPaid;
-            
+
             csv += 'کل قراردادها,' + totalContract + '\n';
             csv += 'کل دریافتی از مشتریان,' + totalReceived + '\n';
             csv += 'باقیمانده دریافتی,' + remaining + '\n';
             csv += 'کل پرداختی (هزینه‌ها),' + totalPaid + '\n';
             csv += 'سود خالص,' + profit + '\n\n';
-            
+
             csv += 'گزارش تفصیلی پروژه‌ها:\n';
             csv += 'کد,مشتری,پروژه,قرارداد کل,دریافت شده,باقیمانده,هزینه‌های پرداختی,سود,وضعیت\n';
-            
+
             customers.forEach((c, i) => {
                 const received = getPayments(c.id);
                 const paid = getExpenses(c.id);
@@ -630,21 +630,21 @@
                 let status = rem === 0 ? 'تسویه شده' : (received > 0 ? 'قسطی' : 'در انتظار');
                 csv += `${i + 1},${c.name},${c.project},${c.total},${received},${rem},${paid},${prof},${status}\n`;
             });
-            
+
             csv += '\n\nدریافت‌های مشتریان:\n';
             csv += 'تاریخ,مشتری,پروژه,مبلغ,یادداشت\n';
             payments.forEach(p => {
                 const c = customers.find(x => x.id === p.cid);
                 csv += `${p.date},${c ? c.name : ''},${c ? c.project : ''},${p.amount},${p.note || ''}\n`;
             });
-            
+
             csv += '\n\nهزینه‌های پرداختی:\n';
             csv += 'تاریخ,پروژه,شرح,پرداخت به,مبلغ\n';
             expenses.forEach(e => {
                 const c = customers.find(x => x.id === e.cid);
                 csv += `${e.date},${c ? c.project : ''},${e.desc},${e.to || ''},${e.amount}\n`;
             });
-            
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
