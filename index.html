@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم مدیریت مالی</title>
+    <title>سیستم مدیریت مالی حرفه‌ای</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg">
-        <!-- Header -->
-        <div class="bg-indigo-600 text-white p-6 rounded-t-lg">
-            <h1 class="text-3xl font-bold">سیستم مدیریت مالی مشتریان</h1>
-            <p class="mt-2">مدیریت سفارشات و هزینه‌ها</p>
+    <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
+        <div class="bg-indigo-600 text-white p-6 rounded-t-lg flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold">سیستم مدیریت مالی حرفه‌ای</h1>
+                <p class="mt-2">مدیریت مشتریان، پرداخت‌ها و هزینه‌ها</p>
+            </div>
+            <button id="btn-export" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100">
+                📥 دانلود Excel
+            </button>
         </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-3 gap-4 p-6 bg-gray-50">
+        <div class="grid grid-cols-4 gap-4 p-6 bg-gray-50">
             <div class="bg-green-100 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">کل درآمد</p>
-                <p id="stat-revenue" class="text-2xl font-bold text-green-600">0 AED</p>
+                <p class="text-sm text-gray-600">کل دریافتی از مشتریان</p>
+                <p id="stat-received" class="text-2xl font-bold text-green-600">0 AED</p>
+            </div>
+            <div class="bg-orange-100 p-4 rounded-lg">
+                <p class="text-sm text-gray-600">باقیمانده دریافتی</p>
+                <p id="stat-remaining" class="text-2xl font-bold text-orange-600">0 AED</p>
             </div>
             <div class="bg-red-100 p-4 rounded-lg">
-                <p class="text-sm text-gray-600">کل هزینه</p>
-                <p id="stat-expense" class="text-2xl font-bold text-red-600">0 AED</p>
+                <p class="text-sm text-gray-600">هزینه‌های پرداختی</p>
+                <p id="stat-paid" class="text-2xl font-bold text-red-600">0 AED</p>
             </div>
             <div class="bg-blue-100 p-4 rounded-lg">
                 <p class="text-sm text-gray-600">سود خالص</p>
@@ -30,63 +37,100 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="flex border-b">
-            <button class="tab-btn px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600" data-tab="customers">مشتریان</button>
-            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="expenses">هزینه‌ها</button>
+            <button class="tab-btn px-6 py-3 font-bold text-indigo-600 border-b-2 border-indigo-600" data-tab="customers">مشتریان و پروژه‌ها</button>
+            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="payments">دریافت‌ها</button>
+            <button class="tab-btn px-6 py-3 text-gray-600" data-tab="expenses">پرداخت‌ها (هزینه‌ها)</button>
             <button class="tab-btn px-6 py-3 text-gray-600" data-tab="reports">گزارش‌ها</button>
         </div>
 
-        <!-- Content -->
         <div class="p-6">
             <!-- Customers Tab -->
             <div id="tab-customers" class="tab-content">
                 <div class="mb-4 flex justify-between">
-                    <h2 class="text-xl font-bold">مشتریان</h2>
-                    <button id="btn-show-add-customer" class="bg-indigo-600 text-white px-4 py-2 rounded">+ افزودن مشتری</button>
+                    <h2 class="text-xl font-bold">پروژه‌های مشتریان</h2>
+                    <button id="btn-add-customer" class="bg-indigo-600 text-white px-4 py-2 rounded">+ پروژه جدید</button>
                 </div>
 
-                <div id="add-customer-form" class="hidden bg-blue-50 p-4 rounded-lg mb-4">
-                    <h3 class="font-bold mb-3">مشتری جدید</h3>
-                    <div class="grid grid-cols-3 gap-3 mb-3">
-                        <input type="text" id="input-name" placeholder="نام مشتری" class="border p-2 rounded">
-                        <input type="text" id="input-project" placeholder="نام پروژه" class="border p-2 rounded">
-                        <input type="number" id="input-amount" placeholder="مبلغ (AED)" class="border p-2 rounded">
+                <div id="form-customer" class="hidden bg-blue-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-3">ثبت پروژه جدید</h3>
+                    <div class="grid grid-cols-4 gap-3 mb-3">
+                        <input type="text" id="inp-cust-name" placeholder="نام مشتری *" class="border p-2 rounded">
+                        <input type="text" id="inp-cust-project" placeholder="نام پروژه *" class="border p-2 rounded">
+                        <input type="number" id="inp-cust-total" placeholder="مبلغ کل قرارداد (AED) *" class="border p-2 rounded">
+                        <input type="text" id="inp-cust-desc" placeholder="توضیحات" class="border p-2 rounded">
                     </div>
-                    <button id="btn-save-customer" class="bg-green-600 text-white px-4 py-2 rounded mr-2">ذخیره</button>
-                    <button id="btn-cancel-customer" class="bg-gray-400 text-white px-4 py-2 rounded">انصراف</button>
+                    <input type="hidden" id="edit-customer-id">
+                    <button id="btn-save-customer" class="bg-green-600 text-white px-4 py-2 rounded">ذخیره</button>
+                    <button id="btn-cancel-customer" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
                 </div>
 
-                <div id="customers-list" class="grid grid-cols-3 gap-4"></div>
+                <div id="customers-list" class="grid grid-cols-1 gap-4"></div>
             </div>
 
-            <!-- Expenses Tab -->
-            <div id="tab-expenses" class="tab-content hidden">
+            <!-- Payments Tab -->
+            <div id="tab-payments" class="tab-content hidden">
                 <div class="mb-4 flex justify-between">
-                    <h2 class="text-xl font-bold">هزینه‌ها</h2>
-                    <button id="btn-show-add-expense" class="bg-indigo-600 text-white px-4 py-2 rounded">+ افزودن هزینه</button>
+                    <h2 class="text-xl font-bold">دریافت‌های مشتریان (پرداخت‌های قسطی)</h2>
+                    <button id="btn-add-payment" class="bg-green-600 text-white px-4 py-2 rounded">+ دریافت جدید</button>
                 </div>
 
-                <div id="add-expense-form" class="hidden bg-red-50 p-4 rounded-lg mb-4">
-                    <h3 class="font-bold mb-3">هزینه جدید</h3>
+                <div id="form-payment" class="hidden bg-green-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-3">ثبت دریافتی جدید</h3>
                     <div class="grid grid-cols-3 gap-3 mb-3">
-                        <select id="input-customer" class="border p-2 rounded">
-                            <option value="">انتخاب مشتری</option>
+                        <select id="inp-pay-customer" class="border p-2 rounded">
+                            <option value="">انتخاب مشتری/پروژه *</option>
                         </select>
-                        <input type="text" id="input-desc" placeholder="شرح هزینه" class="border p-2 rounded">
-                        <input type="number" id="input-exp-amount" placeholder="مبلغ (AED)" class="border p-2 rounded">
+                        <input type="number" id="inp-pay-amount" placeholder="مبلغ دریافتی (AED) *" class="border p-2 rounded">
+                        <input type="text" id="inp-pay-note" placeholder="یادداشت" class="border p-2 rounded">
                     </div>
-                    <button id="btn-save-expense" class="bg-green-600 text-white px-4 py-2 rounded mr-2">ذخیره</button>
-                    <button id="btn-cancel-expense" class="bg-gray-400 text-white px-4 py-2 rounded">انصراف</button>
+                    <button id="btn-save-payment" class="bg-green-600 text-white px-4 py-2 rounded">ثبت دریافت</button>
+                    <button id="btn-cancel-payment" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
                 </div>
 
                 <table class="w-full border">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2 text-right">مشتری</th>
-                            <th class="p-2 text-right">شرح</th>
-                            <th class="p-2 text-right">مبلغ</th>
                             <th class="p-2 text-right">تاریخ</th>
+                            <th class="p-2 text-right">مشتری/پروژه</th>
+                            <th class="p-2 text-right">مبلغ دریافتی</th>
+                            <th class="p-2 text-right">یادداشت</th>
+                            <th class="p-2 text-right">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-list"></tbody>
+                </table>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div id="tab-expenses" class="tab-content hidden">
+                <div class="mb-4 flex justify-between">
+                    <h2 class="text-xl font-bold">هزینه‌های پرداختی (به پیمانکار/کارگر)</h2>
+                    <button id="btn-add-expense" class="bg-red-600 text-white px-4 py-2 rounded">+ هزینه جدید</button>
+                </div>
+
+                <div id="form-expense" class="hidden bg-red-50 p-4 rounded-lg mb-4">
+                    <h3 class="font-bold mb-3">ثبت هزینه جدید</h3>
+                    <div class="grid grid-cols-4 gap-3 mb-3">
+                        <select id="inp-exp-customer" class="border p-2 rounded">
+                            <option value="">انتخاب پروژه *</option>
+                        </select>
+                        <input type="text" id="inp-exp-desc" placeholder="شرح هزینه *" class="border p-2 rounded">
+                        <input type="number" id="inp-exp-amount" placeholder="مبلغ پرداختی (AED) *" class="border p-2 rounded">
+                        <input type="text" id="inp-exp-to" placeholder="پرداخت به چه کسی" class="border p-2 rounded">
+                    </div>
+                    <button id="btn-save-expense" class="bg-green-600 text-white px-4 py-2 rounded">ثبت هزینه</button>
+                    <button id="btn-cancel-expense" class="bg-gray-400 text-white px-4 py-2 rounded mr-2">انصراف</button>
+                </div>
+
+                <table class="w-full border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-right">تاریخ</th>
+                            <th class="p-2 text-right">پروژه</th>
+                            <th class="p-2 text-right">شرح</th>
+                            <th class="p-2 text-right">پرداخت به</th>
+                            <th class="p-2 text-right">مبلغ</th>
                             <th class="p-2 text-right">حذف</th>
                         </tr>
                     </thead>
@@ -96,31 +140,38 @@
 
             <!-- Reports Tab -->
             <div id="tab-reports" class="tab-content hidden">
-                <h2 class="text-xl font-bold mb-4">گزارش تفصیلی</h2>
-                <table class="w-full border">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-2 text-right">کد</th>
-                            <th class="p-2 text-right">مشتری</th>
-                            <th class="p-2 text-right">پروژه</th>
-                            <th class="p-2 text-right">واریز</th>
-                            <th class="p-2 text-right">هزینه</th>
-                            <th class="p-2 text-right">مانده</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reports-list"></tbody>
-                </table>
+                <h2 class="text-xl font-bold mb-4">گزارش کامل پروژه‌ها</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full border text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-2 text-right">کد</th>
+                                <th class="p-2 text-right">مشتری</th>
+                                <th class="p-2 text-right">پروژه</th>
+                                <th class="p-2 text-right">قرارداد کل</th>
+                                <th class="p-2 text-right">دریافت شده</th>
+                                <th class="p-2 text-right">باقیمانده</th>
+                                <th class="p-2 text-right">هزینه‌ها</th>
+                                <th class="p-2 text-right">سود</th>
+                                <th class="p-2 text-right">وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-list"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let customers = JSON.parse(localStorage.getItem('customers') || '[]');
-        let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+        let customers = JSON.parse(localStorage.getItem('customers2') || '[]');
+        let payments = JSON.parse(localStorage.getItem('payments2') || '[]');
+        let expenses = JSON.parse(localStorage.getItem('expenses2') || '[]');
 
         function save() {
-            localStorage.setItem('customers', JSON.stringify(customers));
-            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('customers2', JSON.stringify(customers));
+            localStorage.setItem('payments2', JSON.stringify(payments));
+            localStorage.setItem('expenses2', JSON.stringify(expenses));
         }
 
         function fmt(n) {
@@ -131,53 +182,123 @@
             return new Date().toLocaleDateString('en-GB');
         }
 
+        function getPayments(cid) {
+            return payments.filter(p => p.cid === cid).reduce((s, p) => s + p.amount, 0);
+        }
+
+        function getExpenses(cid) {
+            return expenses.filter(e => e.cid === cid).reduce((s, e) => s + e.amount, 0);
+        }
+
         function updateStats() {
-            const rev = customers.reduce((s, c) => s + c.amount, 0);
-            const exp = expenses.reduce((s, e) => s + e.amount, 0);
-            document.getElementById('stat-revenue').textContent = fmt(rev);
-            document.getElementById('stat-expense').textContent = fmt(exp);
-            document.getElementById('stat-profit').textContent = fmt(rev - exp);
+            const totalContract = customers.reduce((s, c) => s + c.total, 0);
+            const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
+            const totalPaid = expenses.reduce((s, e) => s + e.amount, 0);
+            const remaining = totalContract - totalReceived;
+            const profit = totalReceived - totalPaid;
+
+            document.getElementById('stat-received').textContent = fmt(totalReceived);
+            document.getElementById('stat-remaining').textContent = fmt(remaining);
+            document.getElementById('stat-paid').textContent = fmt(totalPaid);
+            document.getElementById('stat-profit').textContent = fmt(profit);
         }
 
         function renderCustomers() {
             const list = document.getElementById('customers-list');
             if (customers.length === 0) {
-                list.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-8">هیچ مشتری‌ای ثبت نشده</p>';
+                list.innerHTML = '<p class="text-center text-gray-500 py-8">هیچ پروژه‌ای ثبت نشده</p>';
                 return;
             }
             list.innerHTML = customers.map((c, i) => {
-                const exp = expenses.filter(e => e.cid === c.id).reduce((s, e) => s + e.amount, 0);
-                const bal = c.amount - exp;
-                return `<div class="border p-4 rounded-lg">
-                    <div class="flex justify-between mb-2">
-                        <span class="bg-indigo-100 px-2 py-1 rounded text-sm">کد ${i + 1}</span>
-                        <button onclick="delCustomer(${c.id})" class="text-red-600">🗑️</button>
+                const received = getPayments(c.id);
+                const paid = getExpenses(c.id);
+                const remaining = c.total - received;
+                const profit = received - paid;
+                
+                let statusColor = 'bg-gray-200';
+                let statusText = 'در انتظار';
+                if (remaining === 0 && received > 0) {
+                    statusColor = 'bg-green-200 text-green-800';
+                    statusText = 'تسویه شده';
+                } else if (received > 0) {
+                    statusColor = 'bg-yellow-200 text-yellow-800';
+                    statusText = 'قسطی';
+                }
+
+                return `<div class="border rounded-lg p-4 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="bg-indigo-100 px-2 py-1 rounded text-sm font-bold">کد ${i + 1}</span>
+                            <span class="${statusColor} px-2 py-1 rounded text-sm mr-2">${statusText}</span>
+                        </div>
+                        <div>
+                            <button onclick="editCustomer(${c.id})" class="text-blue-600 ml-2">✏️</button>
+                            <button onclick="delCustomer(${c.id})" class="text-red-600">🗑️</button>
+                        </div>
                     </div>
-                    <h3 class="font-bold">${c.name}</h3>
-                    <p class="text-sm text-gray-600">${c.project || '-'}</p>
-                    <div class="mt-3 text-sm">
-                        <div class="flex justify-between"><span>واریز:</span><span class="text-green-600">${fmt(c.amount)}</span></div>
-                        <div class="flex justify-between"><span>هزینه:</span><span class="text-red-600">${fmt(exp)}</span></div>
-                        <div class="flex justify-between font-bold"><span>مانده:</span><span class="${bal >= 0 ? 'text-blue-600' : 'text-red-600'}">${fmt(bal)}</span></div>
+                    <h3 class="font-bold text-lg">${c.name}</h3>
+                    <p class="text-gray-600 mb-3">${c.project}</p>
+                    ${c.desc ? `<p class="text-sm text-gray-500 mb-3">${c.desc}</p>` : ''}
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="bg-blue-50 p-2 rounded">
+                            <p class="text-gray-600">قرارداد کل</p>
+                            <p class="font-bold text-blue-600">${fmt(c.total)}</p>
+                        </div>
+                        <div class="bg-green-50 p-2 rounded">
+                            <p class="text-gray-600">دریافت شده</p>
+                            <p class="font-bold text-green-600">${fmt(received)}</p>
+                        </div>
+                        <div class="${remaining > 0 ? 'bg-orange-50' : 'bg-gray-50'} p-2 rounded">
+                            <p class="text-gray-600">باقیمانده</p>
+                            <p class="font-bold ${remaining > 0 ? 'text-orange-600' : 'text-gray-600'}">${fmt(remaining)}</p>
+                        </div>
+                        <div class="bg-red-50 p-2 rounded">
+                            <p class="text-gray-600">هزینه‌ها</p>
+                            <p class="font-bold text-red-600">${fmt(paid)}</p>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">${c.date}</p>
+                    <div class="mt-3 pt-3 border-t">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">سود:</span>
+                            <span class="font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${fmt(profit)}</span>
+                        </div>
+                    </div>
                 </div>`;
+            }).join('');
+        }
+
+        function renderPayments() {
+            const list = document.getElementById('payments-list');
+            if (payments.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">هیچ دریافتی ثبت نشده</td></tr>';
+                return;
+            }
+            list.innerHTML = payments.map(p => {
+                const c = customers.find(x => x.id === p.cid);
+                return `<tr class="border-t hover:bg-gray-50">
+                    <td class="p-2">${p.date}</td>
+                    <td class="p-2">${c ? c.name + ' - ' + c.project : 'نامشخص'}</td>
+                    <td class="p-2 font-bold text-green-600">${fmt(p.amount)}</td>
+                    <td class="p-2 text-gray-600">${p.note || '-'}</td>
+                    <td class="p-2"><button onclick="delPayment(${p.id})" class="text-red-600">🗑️</button></td>
+                </tr>`;
             }).join('');
         }
 
         function renderExpenses() {
             const list = document.getElementById('expenses-list');
             if (expenses.length === 0) {
-                list.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">هیچ هزینه‌ای ثبت نشده</td></tr>';
+                list.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-gray-500">هیچ هزینه‌ای ثبت نشده</td></tr>';
                 return;
             }
             list.innerHTML = expenses.map(e => {
                 const c = customers.find(x => x.id === e.cid);
-                return `<tr class="border-t">
-                    <td class="p-2">${c ? c.name : 'نامشخص'}</td>
-                    <td class="p-2">${e.desc}</td>
-                    <td class="p-2 text-red-600">${fmt(e.amount)}</td>
+                return `<tr class="border-t hover:bg-gray-50">
                     <td class="p-2">${e.date}</td>
+                    <td class="p-2">${c ? c.project : 'نامشخص'}</td>
+                    <td class="p-2">${e.desc}</td>
+                    <td class="p-2 text-gray-600">${e.to || '-'}</td>
+                    <td class="p-2 font-bold text-red-600">${fmt(e.amount)}</td>
                     <td class="p-2"><button onclick="delExpense(${e.id})" class="text-red-600">🗑️</button></td>
                 </tr>`;
             }).join('');
@@ -186,34 +307,73 @@
         function renderReports() {
             const list = document.getElementById('reports-list');
             if (customers.length === 0) {
-                list.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-gray-500">هیچ مشتری‌ای ثبت نشده</td></tr>';
+                list.innerHTML = '<tr><td colspan="9" class="text-center p-4 text-gray-500">هیچ پروژه‌ای ثبت نشده</td></tr>';
                 return;
             }
             list.innerHTML = customers.map((c, i) => {
-                const exp = expenses.filter(e => e.cid === c.id).reduce((s, e) => s + e.amount, 0);
-                const bal = c.amount - exp;
-                return `<tr class="border-t">
+                const received = getPayments(c.id);
+                const paid = getExpenses(c.id);
+                const remaining = c.total - received;
+                const profit = received - paid;
+                
+                let status = 'در انتظار دریافت';
+                let statusColor = 'text-gray-600';
+                if (remaining === 0) {
+                    status = '✅ تسویه کامل';
+                    statusColor = 'text-green-600';
+                } else if (received > 0) {
+                    status = '⏳ قسطی';
+                    statusColor = 'text-yellow-600';
+                }
+
+                return `<tr class="border-t hover:bg-gray-50">
                     <td class="p-2">${i + 1}</td>
-                    <td class="p-2">${c.name}</td>
-                    <td class="p-2">${c.project || '-'}</td>
-                    <td class="p-2 text-green-600">${fmt(c.amount)}</td>
-                    <td class="p-2 text-red-600">${fmt(exp)}</td>
-                    <td class="p-2 ${bal >= 0 ? 'text-blue-600' : 'text-red-600'}">${fmt(bal)}</td>
+                    <td class="p-2 font-medium">${c.name}</td>
+                    <td class="p-2">${c.project}</td>
+                    <td class="p-2 text-blue-600 font-bold">${fmt(c.total)}</td>
+                    <td class="p-2 text-green-600 font-bold">${fmt(received)}</td>
+                    <td class="p-2 ${remaining > 0 ? 'text-orange-600' : 'text-gray-600'} font-bold">${fmt(remaining)}</td>
+                    <td class="p-2 text-red-600 font-bold">${fmt(paid)}</td>
+                    <td class="p-2 font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${fmt(profit)}</td>
+                    <td class="p-2 ${statusColor}">${status}</td>
                 </tr>`;
             }).join('');
         }
 
-        function updateCustomerSelect() {
-            const sel = document.getElementById('input-customer');
-            sel.innerHTML = '<option value="">انتخاب مشتری</option>' + 
-                customers.map((c, i) => `<option value="${c.id}">کد ${i + 1} - ${c.name}</option>`).join('');
+        function updateSelects() {
+            const opts = '<option value="">انتخاب کنید</option>' + 
+                customers.map((c, i) => `<option value="${c.id}">کد ${i + 1} - ${c.name} (${c.project})</option>`).join('');
+            document.getElementById('inp-pay-customer').innerHTML = opts;
+            document.getElementById('inp-exp-customer').innerHTML = opts;
         }
 
+        window.editCustomer = function(id) {
+            const c = customers.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('inp-cust-name').value = c.name;
+            document.getElementById('inp-cust-project').value = c.project;
+            document.getElementById('inp-cust-total').value = c.total;
+            document.getElementById('inp-cust-desc').value = c.desc || '';
+            document.getElementById('edit-customer-id').value = id;
+            document.getElementById('form-customer').classList.remove('hidden');
+            window.scrollTo(0, 200);
+        };
+
         window.delCustomer = function(id) {
-            if (!confirm('حذف شود؟')) return;
+            if (!confirm('حذف شود؟ تمام دریافت‌ها و هزینه‌های این پروژه هم حذف می‌شود.')) return;
             customers = customers.filter(c => c.id !== id);
+            payments = payments.filter(p => p.cid !== id);
             expenses = expenses.filter(e => e.cid !== id);
             save();
+            renderCustomers();
+            updateStats();
+        };
+
+        window.delPayment = function(id) {
+            if (!confirm('حذف شود؟')) return;
+            payments = payments.filter(p => p.id !== id);
+            save();
+            renderPayments();
             renderCustomers();
             updateStats();
         };
@@ -243,84 +403,182 @@
             });
         });
 
-        // Add Customer
-        document.getElementById('btn-show-add-customer').addEventListener('click', function() {
-            document.getElementById('add-customer-form').classList.remove('hidden');
+        // Customer Form
+        document.getElementById('btn-add-customer').addEventListener('click', () => {
+            document.getElementById('edit-customer-id').value = '';
+            document.getElementById('form-customer').classList.remove('hidden');
         });
 
-        document.getElementById('btn-cancel-customer').addEventListener('click', function() {
-            document.getElementById('add-customer-form').classList.add('hidden');
+        document.getElementById('btn-cancel-customer').addEventListener('click', () => {
+            document.getElementById('form-customer').classList.add('hidden');
+            document.getElementById('inp-cust-name').value = '';
+            document.getElementById('inp-cust-project').value = '';
+            document.getElementById('inp-cust-total').value = '';
+            document.getElementById('inp-cust-desc').value = '';
+            document.getElementById('edit-customer-id').value = '';
         });
 
-        document.getElementById('btn-save-customer').addEventListener('click', function() {
-            const name = document.getElementById('input-name').value.trim();
-            const project = document.getElementById('input-project').value.trim();
-            const amount = parseFloat(document.getElementById('input-amount').value);
-            
-            if (!name || !amount) {
-                alert('لطفاً نام و مبلغ را وارد کنید');
+        document.getElementById('btn-save-customer').addEventListener('click', () => {
+            const name = document.getElementById('inp-cust-name').value.trim();
+            const project = document.getElementById('inp-cust-project').value.trim();
+            const total = parseFloat(document.getElementById('inp-cust-total').value);
+            const desc = document.getElementById('inp-cust-desc').value.trim();
+            const editId = document.getElementById('edit-customer-id').value;
+
+            if (!name || !project || !total) {
+                alert('لطفاً نام، پروژه و مبلغ کل را وارد کنید');
                 return;
             }
 
-            customers.push({
+            if (editId) {
+                const c = customers.find(x => x.id == editId);
+                c.name = name;
+                c.project = project;
+                c.total = total;
+                c.desc = desc;
+            } else {
+                customers.push({
+                    id: Date.now(),
+                    name, project, total, desc,
+                    date: getDate()
+                });
+            }
+
+            save();
+            document.getElementById('btn-cancel-customer').click();
+            renderCustomers();
+            updateStats();
+            updateSelects();
+        });
+
+        // Payment Form
+        document.getElementById('btn-add-payment').addEventListener('click', () => {
+            updateSelects();
+            document.getElementById('form-payment').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-cancel-payment').addEventListener('click', () => {
+            document.getElementById('form-payment').classList.add('hidden');
+        });
+
+        document.getElementById('btn-save-payment').addEventListener('click', () => {
+            const cid = parseInt(document.getElementById('inp-pay-customer').value);
+            const amount = parseFloat(document.getElementById('inp-pay-amount').value);
+            const note = document.getElementById('inp-pay-note').value.trim();
+
+            if (!cid || !amount) {
+                alert('لطفاً مشتری و مبلغ را وارد کنید');
+                return;
+            }
+
+            payments.push({
                 id: Date.now(),
-                name: name,
-                project: project,
-                amount: amount,
+                cid, amount, note,
                 date: getDate()
             });
 
             save();
-            document.getElementById('input-name').value = '';
-            document.getElementById('input-project').value = '';
-            document.getElementById('input-amount').value = '';
-            document.getElementById('add-customer-form').classList.add('hidden');
+            document.getElementById('inp-pay-customer').value = '';
+            document.getElementById('inp-pay-amount').value = '';
+            document.getElementById('inp-pay-note').value = '';
+            document.getElementById('form-payment').classList.add('hidden');
+            renderPayments();
             renderCustomers();
             updateStats();
         });
 
-        // Add Expense
-        document.getElementById('btn-show-add-expense').addEventListener('click', function() {
-            updateCustomerSelect();
-            document.getElementById('add-expense-form').classList.remove('hidden');
+        // Expense Form
+        document.getElementById('btn-add-expense').addEventListener('click', () => {
+            updateSelects();
+            document.getElementById('form-expense').classList.remove('hidden');
         });
 
-        document.getElementById('btn-cancel-expense').addEventListener('click', function() {
-            document.getElementById('add-expense-form').classList.add('hidden');
+        document.getElementById('btn-cancel-expense').addEventListener('click', () => {
+            document.getElementById('form-expense').classList.add('hidden');
         });
 
-        document.getElementById('btn-save-expense').addEventListener('click', function() {
-            const cid = parseInt(document.getElementById('input-customer').value);
-            const desc = document.getElementById('input-desc').value.trim();
-            const amount = parseFloat(document.getElementById('input-exp-amount').value);
-            
+        document.getElementById('btn-save-expense').addEventListener('click', () => {
+            const cid = parseInt(document.getElementById('inp-exp-customer').value);
+            const desc = document.getElementById('inp-exp-desc').value.trim();
+            const amount = parseFloat(document.getElementById('inp-exp-amount').value);
+            const to = document.getElementById('inp-exp-to').value.trim();
+
             if (!cid || !desc || !amount) {
-                alert('لطفاً همه فیلدها را پر کنید');
+                alert('لطفاً پروژه، شرح و مبلغ را وارد کنید');
                 return;
             }
 
             expenses.push({
                 id: Date.now(),
-                cid: cid,
-                desc: desc,
-                amount: amount,
+                cid, desc, amount, to,
                 date: getDate()
             });
 
             save();
-            document.getElementById('input-customer').value = '';
-            document.getElementById('input-desc').value = '';
-            document.getElementById('input-exp-amount').value = '';
-            document.getElementById('add-expense-form').classList.add('hidden');
+            document.getElementById('inp-exp-customer').value = '';
+            document.getElementById('inp-exp-desc').value = '';
+            document.getElementById('inp-exp-amount').value = '';
+            document.getElementById('inp-exp-to').value = '';
+            document.getElementById('form-expense').classList.add('hidden');
             renderExpenses();
             renderCustomers();
             updateStats();
         });
 
+        // Export Excel
+        document.getElementById('btn-export').addEventListener('click', () => {
+            let csv = '\ufeffگزارش کامل مالی\n\n';
+            csv += 'تاریخ گزارش:,' + getDate() + '\n\n';
+            
+            csv += 'خلاصه مالی:\n';
+            const totalContract = customers.reduce((s, c) => s + c.total, 0);
+            const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
+            const totalPaid = expenses.reduce((s, e) => s + e.amount, 0);
+            const remaining = totalContract - totalReceived;
+            const profit = totalReceived - totalPaid;
+            
+            csv += 'کل قراردادها,' + totalContract + '\n';
+            csv += 'کل دریافتی از مشتریان,' + totalReceived + '\n';
+            csv += 'باقیمانده دریافتی,' + remaining + '\n';
+            csv += 'کل پرداختی (هزینه‌ها),' + totalPaid + '\n';
+            csv += 'سود خالص,' + profit + '\n\n';
+            
+            csv += 'گزارش تفصیلی پروژه‌ها:\n';
+            csv += 'کد,مشتری,پروژه,قرارداد کل,دریافت شده,باقیمانده,هزینه‌های پرداختی,سود,وضعیت\n';
+            
+            customers.forEach((c, i) => {
+                const received = getPayments(c.id);
+                const paid = getExpenses(c.id);
+                const rem = c.total - received;
+                const prof = received - paid;
+                let status = rem === 0 ? 'تسویه شده' : (received > 0 ? 'قسطی' : 'در انتظار');
+                csv += `${i + 1},${c.name},${c.project},${c.total},${received},${rem},${paid},${prof},${status}\n`;
+            });
+            
+            csv += '\n\nدریافت‌های مشتریان:\n';
+            csv += 'تاریخ,مشتری,پروژه,مبلغ,یادداشت\n';
+            payments.forEach(p => {
+                const c = customers.find(x => x.id === p.cid);
+                csv += `${p.date},${c ? c.name : ''},${c ? c.project : ''},${p.amount},${p.note || ''}\n`;
+            });
+            
+            csv += '\n\nهزینه‌های پرداختی:\n';
+            csv += 'تاریخ,پروژه,شرح,پرداخت به,مبلغ\n';
+            expenses.forEach(e => {
+                const c = customers.find(x => x.id === e.cid);
+                csv += `${e.date},${c ? c.project : ''},${e.desc},${e.to || ''},${e.amount}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'financial_report_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+        });
+
         // Initialize
         renderCustomers();
+        renderPayments();
         renderExpenses();
         updateStats();
-    </script>
-</body>
-</html>
+        updateSelects();
