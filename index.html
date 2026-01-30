@@ -62,16 +62,26 @@
 
                 <div id="form-customer" class="hidden bg-blue-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت پروژه جدید</h3>
-                    <div class="grid grid-cols-4 gap-3 mb-3">
+                    <div class="grid grid-cols-6 gap-3 mb-3">
                         <label for="inp-cust-name" class="sr-only">نام مشتری</label>
                         <input type="text" id="inp-cust-name" placeholder="نام مشتری *" class="border p-2 rounded" required>
-                        
+
                         <label for="inp-cust-project" class="sr-only">نام پروژه</label>
                         <input type="text" id="inp-cust-project" placeholder="نام پروژه *" class="border p-2 rounded" required>
-                        
+
                         <label for="inp-cust-total" class="sr-only">مبلغ کل قرارداد</label>
                         <input type="number" id="inp-cust-total" placeholder="مبلغ کل قرارداد (AED) *" class="border p-2 rounded" min="0" step="0.01" required>
-                        
+
+                        <label for="inp-cust-balance-type" class="sr-only">نوع مانده</label>
+                        <select id="inp-cust-balance-type" class="border p-2 rounded" aria-label="نوع مانده">
+                            <option value="">بدون مانده</option>
+                            <option value="debtor">بدهکار (مبلغ اولیه به‌عنوان دریافت ثبت شود)</option>
+                            <option value="creditor">بستانکار (مبلغ اولیه به‌عنوان هزینه ثبت شود)</option>
+                        </select>
+
+                        <label for="inp-cust-balance-amount" class="sr-only">مبلغ مانده اولیه</label>
+                        <input type="number" id="inp-cust-balance-amount" placeholder="مبلغ مانده اولیه (AED)" class="border p-2 rounded" min="0" step="0.01">
+
                         <label for="inp-cust-desc" class="sr-only">توضیحات</label>
                         <input type="text" id="inp-cust-desc" placeholder="توضیحات" class="border p-2 rounded" aria-describedby="cust-desc-help">
                     </div>
@@ -134,7 +144,7 @@
                 <div id="form-expense" class="hidden bg-red-50 p-4 rounded-lg mb-4" aria-hidden="true">
                     <h3 class="font-bold mb-3">ثبت هزینه جدید</h3>
                     <div class="grid grid-cols-4 gap-3 mb-3">
-                        <label for="inp-exp-customer" class="sr-only">انتخاب پرو��ه</label>
+                        <label for="inp-exp-customer" class="sr-only">انتخاب پروژه</label>
                         <select id="inp-exp-customer" class="border p-2 rounded" required>
                             <option value="">انتخاب پروژه *</option>
                         </select>
@@ -312,13 +322,7 @@
             }
             list.innerHTML = payments.map(p => {
                 const c = customers.find(x => x.id === p.cid);
-                return `<tr class="border-t hover:bg-gray-50">
-                    <td class="p-2">${p.date}</td>
-                    <td class="p-2">${c ? c.name + ' - ' + c.project : 'نامشخص'}</td>
-                    <td class="p-2 font-bold text-green-600">${fmt(p.amount)}</td>
-                    <td class="p-2 text-gray-600">${p.note || '-'}</td>
-                    <td class="p-2"><button type="button" onclick="delPayment(${p.id})" aria-label="حذف دریافتی" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>
-                </tr>`;
+                return `<tr class="border-t hover:bg-gray-50">\n                    <td class="p-2">${p.date}</td>\n                    <td class="p-2">${c ? c.name + ' - ' + c.project : 'نامشخص'}</td>\n                    <td class="p-2 font-bold text-green-600">${fmt(p.amount)}</td>\n                    <td class="p-2 text-gray-600">${p.note || '-'}</td>\n                    <td class="p-2"><button type="button" onclick="delPayment(${p.id})" aria-label="حذف دریافتی" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>\n                </tr>`;
             }).join('');
         }
 
@@ -330,14 +334,7 @@
             }
             list.innerHTML = expenses.map(e => {
                 const c = customers.find(x => x.id === e.cid);
-                return `<tr class="border-t hover:bg-gray-50">
-                    <td class="p-2">${e.date}</td>
-                    <td class="p-2">${c ? c.project : 'نامشخص'}</td>
-                    <td class="p-2">${e.desc}</td>
-                    <td class="p-2 text-gray-600">${e.to || '-'}</td>
-                    <td class="p-2 font-bold text-red-600">${fmt(e.amount)}</td>
-                    <td class="p-2"><button type="button" onclick="delExpense(${e.id})" aria-label="حذف هزینه" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>
-                </tr>`;
+                return `<tr class="border-t hover:bg-gray-50">\n                    <td class="p-2">${e.date}</td>\n                    <td class="p-2">${c ? c.project : 'نامشخص'}</td>\n                    <td class="p-2">${e.desc}</td>\n                    <td class="p-2 text-gray-600">${e.to || '-'}</td>\n                    <td class="p-2 font-bold text-red-600">${fmt(e.amount)}</td>\n                    <td class="p-2"><button type="button" onclick="delExpense(${e.id})" aria-label="حذف هزینه" class="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">🗑️</button></td>\n                </tr>`;
             }).join('');
         }
 
@@ -363,22 +360,12 @@
                     statusColor = 'text-yellow-600';
                 }
 
-                return `<tr class="border-t hover:bg-gray-50">
-                    <td class="p-2">${i + 1}</td>
-                    <td class="p-2 font-medium">${c.name}</td>
-                    <td class="p-2">${c.project}</td>
-                    <td class="p-2 text-blue-600 font-bold">${fmt(c.total)}</td>
-                    <td class="p-2 text-green-600 font-bold">${fmt(received)}</td>
-                    <td class="p-2 ${remaining > 0 ? 'text-orange-600' : 'text-gray-600'} font-bold">${fmt(remaining)}</td>
-                    <td class="p-2 text-red-600 font-bold">${fmt(paid)}</td>
-                    <td class="p-2 font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${fmt(profit)}</td>
-                    <td class="p-2 ${statusColor}">${status}</td>
-                </tr>`;
+                return `<tr class="border-t hover:bg-gray-50">\n                    <td class="p-2">${i + 1}</td>\n                    <td class="p-2 font-medium">${c.name}</td>\n                    <td class="p-2">${c.project}</td>\n                    <td class="p-2 text-blue-600 font-bold">${fmt(c.total)}</td>\n                    <td class="p-2 text-green-600 font-bold">${fmt(received)}</td>\n                    <td class="p-2 ${remaining > 0 ? 'text-orange-600' : 'text-gray-600'} font-bold">${fmt(remaining)}</td>\n                    <td class="p-2 text-red-600 font-bold">${fmt(paid)}</td>\n                    <td class="p-2 font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">${fmt(profit)}</td>\n                    <td class="p-2 ${statusColor}">${status}</td>\n                </tr>`;
             }).join('');
         }
 
         function updateSelects() {
-            const opts = '<option value="">انتخاب کنید</option>' + 
+            const opts = '<option value="">انتخاب کنید</option>' +  
                 customers.map((c, i) => `<option value="${c.id}">کد ${i + 1} - ${c.name} (${c.project})</option>`).join('');
             document.getElementById('inp-pay-customer').innerHTML = opts;
             document.getElementById('inp-exp-customer').innerHTML = opts;
@@ -390,6 +377,7 @@
             document.getElementById('inp-cust-name').value = c.name;
             document.getElementById('inp-cust-project').value = c.project;
             document.getElementById('inp-cust-total').value = c.total;
+            // Note: balance-type/amount were applied only at create time; during edit we don't auto-modify past payment/expense entries.
             document.getElementById('inp-cust-desc').value = c.desc || '';
             document.getElementById('edit-customer-id').value = id;
             document.getElementById('form-customer').classList.remove('hidden');
@@ -399,7 +387,6 @@
         };
 
         window.delCustomer = function(id) {
-            // use a custom confirm flow fallback for screen readers; keep native confirm for simplicity
             if (!confirm('حذف شود؟ تمام دریافت‌ها و هزینه‌های این پروژه هم حذف می‌شود.')) return;
             customers = customers.filter(c => c.id !== id);
             payments = payments.filter(p => p.cid !== id);
@@ -467,6 +454,9 @@
         // Customer Form
         document.getElementById('btn-add-customer').addEventListener('click', () => {
             document.getElementById('edit-customer-id').value = '';
+            // reset balance fields when opening create form
+            document.getElementById('inp-cust-balance-type').value = '';
+            document.getElementById('inp-cust-balance-amount').value = '';
             document.getElementById('form-customer').classList.remove('hidden');
             document.getElementById('form-customer').setAttribute('aria-hidden', 'false');
             document.getElementById('inp-cust-name').focus();
@@ -478,6 +468,8 @@
             document.getElementById('inp-cust-name').value = '';
             document.getElementById('inp-cust-project').value = '';
             document.getElementById('inp-cust-total').value = '';
+            document.getElementById('inp-cust-balance-amount').value = '';
+            document.getElementById('inp-cust-balance-type').value = '';
             document.getElementById('inp-cust-desc').value = '';
             document.getElementById('edit-customer-id').value = '';
         });
@@ -487,31 +479,68 @@
             const project = document.getElementById('inp-cust-project').value.trim();
             const total = parseFloat(document.getElementById('inp-cust-total').value);
             const desc = document.getElementById('inp-cust-desc').value.trim();
+            const balanceType = document.getElementById('inp-cust-balance-type').value;
+            const balanceAmount = parseFloat(document.getElementById('inp-cust-balance-amount').value);
             const editId = document.getElementById('edit-customer-id').value;
 
             if (!name || !project || isNaN(total)) {
-                // show accessible error
                 alert('لطفاً نام، پروژه و مبلغ کل را وارد کنید');
                 return;
             }
 
             if (editId) {
+                // Edit existing project (note: initial-balance auto-registration is only for new creates)
                 const c = customers.find(x => x.id == editId);
                 c.name = name;
                 c.project = project;
                 c.total = total;
                 c.desc = desc;
-            } else {
-                customers.push({
-                    id: Date.now(),
-                    name, project, total, desc,
-                    date: getDate()
-                });
+                save();
+                document.getElementById('btn-cancel-customer').click();
+                renderCustomers();
+                updateStats();
+                updateSelects();
+                const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'مشخصات پروژه به‌روز شد';
+                return;
+            }
+
+            // Create new project
+            const newId = Date.now();
+            customers.push({
+                id: newId,
+                name, project, total, desc,
+                date: getDate()
+            });
+
+            // If a balance type and amount provided, register initial payment or expense
+            if (balanceType && !isNaN(balanceAmount) && Number(balanceAmount) > 0) {
+                if (balanceType === 'debtor') {
+                    // add as a payment (received)
+                    payments.push({
+                        id: Date.now() + 1,
+                        cid: newId,
+                        amount: Number(balanceAmount),
+                        note: 'مانده اولیه (بدهکار)',
+                        date: getDate()
+                    });
+                } else if (balanceType === 'creditor') {
+                    // add as an expense
+                    expenses.push({
+                        id: Date.now() + 2,
+                        cid: newId,
+                        desc: 'مانده اولیه (بستانکار)',
+                        amount: Number(balanceAmount),
+                        to: '',
+                        date: getDate()
+                    });
+                }
             }
 
             save();
             document.getElementById('btn-cancel-customer').click();
             renderCustomers();
+            renderPayments();
+            renderExpenses();
             updateStats();
             updateSelects();
             const live = document.getElementById('sr-live-notice'); if (live) live.textContent = 'یک پروژه ذخیره شد';
@@ -605,23 +634,23 @@
         document.getElementById('btn-export').addEventListener('click', () => {
             let csv = '\uFEFFگزارش کامل مالی\n\n';
             csv += 'تاریخ گزارش:,' + getDate() + '\n\n';
-
+            
             csv += 'خلاصه مالی:\n';
             const totalContract = customers.reduce((s, c) => s + Number(c.total || 0), 0);
             const totalReceived = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
             const totalPaid = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
             const remaining = totalContract - totalReceived;
             const profit = totalReceived - totalPaid;
-
+            
             csv += 'کل قراردادها,' + totalContract + '\n';
             csv += 'کل دریافتی از مشتریان,' + totalReceived + '\n';
             csv += 'باقیمانده دریافتی,' + remaining + '\n';
             csv += 'کل پرداختی (هزینه‌ها),' + totalPaid + '\n';
             csv += 'سود خالص,' + profit + '\n\n';
-
+            
             csv += 'گزارش تفصیلی پروژه‌ها:\n';
             csv += 'کد,مشتری,پروژه,قرارداد کل,دریافت شده,باقیمانده,هزینه‌های پرداختی,سود,وضعیت\n';
-
+            
             customers.forEach((c, i) => {
                 const received = getPayments(c.id);
                 const paid = getExpenses(c.id);
@@ -630,21 +659,21 @@
                 let status = rem === 0 ? 'تسویه شده' : (received > 0 ? 'قسطی' : 'در انتظار');
                 csv += `${i + 1},${c.name},${c.project},${c.total},${received},${rem},${paid},${prof},${status}\n`;
             });
-
+            
             csv += '\n\nدریافت‌های مشتریان:\n';
             csv += 'تاریخ,مشتری,پروژه,مبلغ,یادداشت\n';
             payments.forEach(p => {
                 const c = customers.find(x => x.id === p.cid);
                 csv += `${p.date},${c ? c.name : ''},${c ? c.project : ''},${p.amount},${p.note || ''}\n`;
             });
-
+            
             csv += '\n\nهزینه‌های پرداختی:\n';
             csv += 'تاریخ,پروژه,شرح,پرداخت به,مبلغ\n';
             expenses.forEach(e => {
                 const c = customers.find(x => x.id === e.cid);
                 csv += `${e.date},${c ? c.project : ''},${e.desc},${e.to || ''},${e.amount}\n`;
             });
-
+            
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
